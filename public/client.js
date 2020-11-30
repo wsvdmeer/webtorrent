@@ -12,7 +12,6 @@ let info
 let magnetResults
 let searchResults
 
-// const test = 'magnet:?xt=urn:btih:d0e7651352a61b78d4da238126964535673f1208&dn=Taking.Fire.S01E01.Band.of.Brothers.720p.HDTV.x264-DHD[eztv].mkv&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Feddie4.nl%3A6969&tr=udp%3A%2F%2Ftracker.pirateparty.gr%3A6969&tr=udp%3A%2F%2Fopentrackr.org%3A1337&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337'
 const init = () => {
   debug = document.getElementById('debug')
   type = document.getElementById('type')

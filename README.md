@@ -46,9 +46,17 @@ sudo cp Sweden.ovpn autostart.conf
 sudo nano /etc/default/openvpn
 
 
-## Setup NODE
+## Setup NODE + NPM
 https://dev.to/bogdaaamn/run-your-nodejs-application-on-a-headless-raspberry-pi-4jnn
 
+curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
+sudo apt-get install -y nodejs
+
+node --version
+npm --version
+
+## Setup GIT
+sudo apt-get install git
 
 
 Seedbox
