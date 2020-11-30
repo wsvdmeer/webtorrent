@@ -51,8 +51,21 @@ const showFile = (event) => {
 // API
 // SEARCH
 const streamTorrent = (hash, file) => {
-  // player.setAttribute('src', '/stream/' + hash + '/' + file)
+  // play here
+  player.setAttribute('src', '/stream/' + hash + '/' + file)
 
+  // send current file to other clients
+  const xhr = new XMLHttpRequest()
+  xhr.open('GET', '/setstream/' + hash + '/' + file, true)
+  xhr.setRequestHeader('Content-Type', 'application/json')
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.responseText) {
+        console.log(`set : ${this.responseText}`)
+      }
+    }
+  }
+  xhr.send()
 }
 
 // SELECT
@@ -165,50 +178,64 @@ const searchTorrents = (search, type) => {
       page: 1
     }
     log(`Search torrent ${query.type} ${query.query}`)
+
+    const li = document.createElement('li')
+    const title = document.createElement('h2')
+    title.innerText = 'Searching...'
+    li.appendChild(title)
+    torrents.appendChild(li)
+
     const xhr = new XMLHttpRequest()
-    xhr.onerror = function () {
-      console.log('error')
-    }
     xhr.open('GET', '/searchtorrent/' + JSON.stringify(query), true)
     xhr.setRequestHeader('Content-Type', 'application/json')
     xhr.onreadystatechange = function () {
       console.log(xhr.readyState)
+      torrents.innerHTML = ''
       if (xhr.readyState === 4) {
         input.disabled = false
         button.disabled = false
         if (xhr.responseText) {
           console.log(xhr.responseText)
           const results = JSON.parse(xhr.responseText)
-          results.forEach(item => {
-            console.log(item)
+          if (results && results.length > 0) {
+            results.forEach(item => {
+              console.log(item)
+              const li = document.createElement('li')
+              if (item.link) {
+                li.setAttribute('url', item.link)
+              }
+              if (item.site) {
+                li.setAttribute('url', item.site)
+              }
+
+              // title
+              const title = document.createElement('h2')
+              title.innerText = item.fileName
+
+              // seeders
+              const seeders = document.createElement('span')
+              seeders.innerText = `score ${item.score} seeders ${item.seeders} leechers ${item.leechers}`
+              seeders.classList.add('seeders')
+              // fileinfo
+              const file = document.createElement('span')
+              file.innerText = `size ${item.size} codec ${item.codec} resolution ${item.resolution}`
+              file.classList.add('file')
+
+              li.appendChild(title)
+              li.appendChild(file)
+              li.appendChild(seeders)
+
+              torrents.appendChild(li)
+              li.addEventListener('click', selectTorrent)
+            })
+          } else {
+            torrents.innerHTML = ''
             const li = document.createElement('li')
-            if (item.link) {
-              li.setAttribute('url', item.link)
-            }
-            if (item.site) {
-              li.setAttribute('url', item.site)
-            }
-
-            // title
             const title = document.createElement('h2')
-            title.innerText = item.fileName
-
-            // seeders
-            const seeders = document.createElement('span')
-            seeders.innerText = `score ${item.score} seeders ${item.seeders} leechers ${item.leechers}`
-            seeders.classList.add('seeders')
-            // fileinfo
-            const file = document.createElement('span')
-            file.innerText = `size ${item.size} codec ${item.codec} resolution ${item.resolution}`
-            file.classList.add('file')
-
+            title.innerText = 'No results'
             li.appendChild(title)
-            li.appendChild(file)
-            li.appendChild(seeders)
-
             torrents.appendChild(li)
-            li.addEventListener('click', selectTorrent)
-          })
+          }
         }
       }
     }

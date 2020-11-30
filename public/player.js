@@ -1,15 +1,12 @@
 let player
 let info
+let tempVideo
 const init = () => {
   info = document.getElementById('info')
   player = document.getElementById('video')
   checkStream()
 }
 
-// SEARCH
-/* const streamTorrent = (hash, file) => {
-  player.setAttribute('src', '/stream/' + hash + '/' + file)
-} */
 const checkStream = () => {
   setTimeout(function () {
     const xhr = new XMLHttpRequest()
@@ -20,6 +17,13 @@ const checkStream = () => {
         if (xhr.responseText) {
           console.log(this.responseText)
           const result = JSON.parse(xhr.responseText)
+          if (result.hash && result.filename) {
+            const currentVideo = '/stream/' + result.hash + '/' + result.filename
+            if (tempVideo !== currentVideo) {
+              player.setAttribute('src', currentVideo)
+              tempVideo = currentVideo
+            }
+          }
           info.innerText = `hash ${result.hash} filename ${result.filename}`
         }
         checkStream()

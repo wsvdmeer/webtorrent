@@ -58,8 +58,11 @@ npm --version
 ## Setup GIT
 sudo apt-get install git
 
+## Clone project
+git clone https://github.com/wsvdmeer/webtorrent.git
 
-Seedbox
-https://github.com/sebgl/htpc-download-box
-https://github.com/ghostserverd/mediaserver-docker#about
+## Install dependencies
+cd webtorrent
+npm install
+
 

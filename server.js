@@ -3,8 +3,16 @@ const path = require('path')
 const bodyParser = require('body-parser')
 const WebTorrent = require('webtorrent')
 const TorrentIndexer = require('torrent-indexer')
+
 const TorrentSearchApi = require('torrent-search-api')
-TorrentSearchApi.enablePublicProviders()
+TorrentSearchApi.enableProvider('ThePirateBay')
+TorrentSearchApi.enableProvider('1337x')
+TorrentSearchApi.enableProvider('Torrentz2')
+TorrentSearchApi.enableProvider('KickassTorrents')
+TorrentSearchApi.enableProvider('Rarbg')
+TorrentSearchApi.enableProvider('Yts')
+TorrentSearchApi.enableProvider('Eztv')
+
 const client = new WebTorrent()
 
 const app = express()
@@ -75,8 +83,16 @@ app.get('/search/:search', function (req, res, next) {
 app.get('/searchtorrent/:search', async function (req, res) {
   const data = JSON.parse(req.params.search)
   const query = data.query + ' x264 webrip'
+  console.log(query)
+
+  const torrents = await TorrentSearchApi.search(query, 'TV', 20)
+  console.log(torrents)
+
   const results = await search(query, data.type)
   console.log(results)
+  if (results.length > 0) {
+    console.log(`Results : ${results.length}`)
+  }
   res.send(JSON.stringify(results))
 })
 
@@ -167,6 +183,7 @@ app.get('/setstream/:magnet/:filename', async function (req, res, next) {
     hash: magnet,
     filename: filename
   }
+  console.log(`stream : ${currentStream.hash} ${currentStream.filename}`)
 })
 
 // STREAM
