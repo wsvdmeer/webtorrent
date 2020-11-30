@@ -1,0 +1,202 @@
+<html>
+
+<head>
+  <script type="module" src='client.js'></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #eee;
+      position: relative;
+      font-size: 12px;
+    }
+
+    select{
+      border:1px solid #ccc;
+      border-radius: 5px;
+      padding:10px;
+    }
+
+    input{
+      border:1px solid #ccc;
+      border-radius: 5px;
+      padding:10px;
+    }
+
+    button{
+      border:none;
+      background-color:#000;
+      color:white;
+      padding:10px;
+      border-radius: 5px;
+      cursor:pointer;
+    }
+
+    #nav {
+      width: 100%;
+      background-color: #fff;
+      padding: 20px;
+      height: 100px;
+    }
+
+    #main {
+      width: 100%;
+      position: absolute;
+      top: 100px;
+      bottom: 0px;
+    }
+
+    #right {
+      height: 100%;
+      width: 300px;
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      background-color: #ccc;
+      overflow-y: auto;
+    }
+
+    #player {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      top: 0;
+      left: 0;
+    }
+
+    #info {
+      position: absolute;
+      top: 300px;
+      width: 100%;
+      height:32px;
+      background-color:#333;
+      color:white;
+      padding:10px;
+    }
+
+    #debug {
+      position: absolute;
+      top: 332px;
+      bottom: 0px;
+      width: 100%;
+    }
+
+    #content {
+      position: absolute;
+      top: 0px;
+      bottom: 0;
+      left: 0;
+      bottom: 0px;
+      right: 300px;
+      overflow-y: auto;
+    }
+
+   .list {
+      list-style: none;
+      width: 25%;
+      display: block;
+      position: absolute;
+      min-height: 100%;
+      top: 0;
+    }
+
+    #searchresults{
+      left:0;
+    }
+    
+    #torrents {
+      left:50%;
+    }
+
+    #files {
+      right:0;
+      background-color: #e5e5e5;
+    }
+
+    #queue {
+      left:25%;
+      color:white;
+      background-color:#222;
+    }
+
+    li>* {
+      pointer-events: none;
+    }
+
+    li> button{
+      pointer-events: all;
+    }
+
+    .list li{
+      padding: 10px;
+      cursor: pointer;
+      overflow-wrap: break-word;
+      margin-bottom:5px;
+      background-color:#fff;
+      border-radius:5px;
+      color:#000;
+    }
+
+    .list li img{
+      width:100px;
+      height:auto;
+    }
+
+    .list li span{
+      font-size: 13px;
+    }
+
+    .list li h2{
+      font-size: 15px;
+    }
+
+    .file,
+    .seeders,
+    h2 {
+      width: 100%;
+      padding: 10px;
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="nav">
+    <input type="text" id="input" placeholder="search" value="Doom Patrol" />
+    <select name="type" id="type">
+      <option value="tv">TV</option>
+      <option value="movies">Movies</option>
+    </select>
+    <button id="button">Search</button>
+  </div>
+  <div id="main">
+    <div id="right">
+      <div id="player">
+        <video id="video" controls autoplay width="300" height="300">
+          <source src="" type="video/mp4">
+        </video>
+      </div>
+      <div id="info"></div>
+      <div id="debug"></div>
+    </div>
+    <div id="content">
+      <ul id='searchresults' class='list'>
+      </ul>
+      <ul id='torrents' class='list'>
+      </ul>
+      <ul id='queue' class='list'>
+      </ul>
+      <ul id='files' class='list'>
+      </ul>
+      
+    </div>
+  </div>
+</body>
+
+</html>
