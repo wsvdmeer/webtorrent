@@ -86,9 +86,11 @@ app.get('/searchtorrent/:search', async function (req, res) {
   console.log(query)
 
   const torrents = await TorrentSearchApi.search(query, 'TV', 20)
+  console.log('TorrentSearchApi')
   console.log(torrents)
 
   const results = await search(query, data.type)
+  console.log('TorrentIndexer')
   console.log(results)
   if (results.length > 0) {
     console.log(`Results : ${results.length}`)

@@ -15,13 +15,15 @@ const checkStream = () => {
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4) {
         if (xhr.responseText) {
-          console.log(this.responseText)
           const result = JSON.parse(xhr.responseText)
           if (result.hash && result.filename) {
-            const currentVideo = '/stream/' + result.hash + '/' + result.filename
+            const currentVideo = '/stream/' + result.hash + '/' + result.filenames
             if (tempVideo !== currentVideo) {
-              player.setAttribute('src', currentVideo)
+              player.remopveAttribute('src')
               tempVideo = currentVideo
+              player.setAttribute('src', tempVideo)
+              
+              console.log(`change to : hash ${result.hash} filename ${result.filename}`)
             }
           }
           info.innerText = `hash ${result.hash} filename ${result.filename}`
