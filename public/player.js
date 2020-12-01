@@ -19,10 +19,9 @@ const checkStream = () => {
           if (result.hash && result.filename) {
             const currentVideo = '/stream/' + result.hash + '/' + result.filenames
             if (tempVideo !== currentVideo) {
-              player.remopveAttribute('src')
+              player.removeAttribute('src')
               tempVideo = currentVideo
               player.setAttribute('src', tempVideo)
-              
               console.log(`change to : hash ${result.hash} filename ${result.filename}`)
             }
           }
