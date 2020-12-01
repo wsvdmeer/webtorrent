@@ -52,19 +52,27 @@ app.get('/search/:search', function (req, res, next) {
   const data = JSON.parse(req.params.search)
 
   let img
-  if (data.type === 'tv') {
-    const result = {
-      title: '',
-      poster: '',
-      episodes: []
+  // if (data.type === 'tv') {
+  const result = {
+    title: '',
+    poster: '',
+    results: [],
+    type: ''
+  }
+  imdbClient.get({ name: data.query }).then((search) => {
+    result.poster = search.poster
+    result.title = search.name
+    img = search.poster
+    switch (search.constructor.name) {
+      case 'Movie':
+        result.type = 'movie'
+        break
+      case 'TVShow':
+        result.type = 'tv'
+        return search.episodes()
     }
-    imdbClient.get({ name: data.query }).then((search) => {
-      console.log(search.poster)
-      result.poster = search.poster
-      result.title = search.name
-      img = search.poster
-      return search.episodes()
-    }).then((eps) => {
+  }).then((eps) => {
+    if (eps) {
       const episodes = []
       eps.forEach((item) => {
         if (item.poster === undefined) {
@@ -72,12 +80,13 @@ app.get('/search/:search', function (req, res, next) {
         }
         episodes.push(item)
       })
-      result.episodes = episodes
-      res.send(JSON.stringify(result))
-    }).catch((error) => {
-      next(error)
-    })
-  }
+      result.results = episodes
+    }
+    console.log(result)
+    res.send(JSON.stringify(result))
+  }).catch((error) => {
+    next(error)
+  })
 })
 
 app.get('/searchtorrent/:search', async function (req, res) {

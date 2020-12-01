@@ -122,40 +122,58 @@ const search = () => {
         button.disabled = false
         if (xhr.responseText) {
           const result = JSON.parse(xhr.responseText)
-          result.episodes.forEach(episode => {
+          if (result.type === 'tv') {
+            result.results.forEach(episode => {
+              const li = document.createElement('li')
+              const img = document.createElement('img')
+              img.src = episode.poster
+
+              const title = document.createElement('h2')
+              title.innerText = episode.title
+
+              const info = document.createElement('span')
+
+              li.appendChild(img)
+              li.appendChild(title)
+              li.appendChild(info)
+
+              // create query
+              let s = `s${episode.season.toString()}`
+              if (episode.season < 10) {
+                s = `s0${episode.season}`
+              }
+
+              let e = `e${episode.episode.toString()}`
+              if (episode.episode < 10) {
+                e = `e0${episode.episode}`
+              }
+
+              info.innerText = `Season ${s} Episode ${e}`
+
+              const query = `${result.title} ${s}${e}`
+
+              li.setAttribute('query', query)
+
+              searchResults.appendChild(li)
+              li.addEventListener('click', searchTorrent)
+            })
+          } else {
+            // movie
             const li = document.createElement('li')
             const img = document.createElement('img')
-            img.src = episode.poster
+            img.src = result.poster
 
             const title = document.createElement('h2')
-            title.innerText = episode.title
-
-            const info = document.createElement('span')
+            title.innerText = result.title
 
             li.appendChild(img)
             li.appendChild(title)
-            li.appendChild(info)
 
-            // create query
-            let s = `s${episode.season.toString()}`
-            if (episode.season < 10) {
-              s = `s0${episode.season}`
-            }
-
-            let e = `e${episode.episode.toString()}`
-            if (episode.episode < 10) {
-              e = `e0${episode.episode}`
-            }
-
-            info.innerText = `Season ${s} Episode ${e}`
-
-            const query = `${result.title} ${s}${e}`
-
+            const query = `${result.title}`
             li.setAttribute('query', query)
-
             searchResults.appendChild(li)
             li.addEventListener('click', searchTorrent)
-          })
+          }
         }
       }
     }
