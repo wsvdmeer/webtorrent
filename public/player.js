@@ -1,11 +1,39 @@
 let player
+// let videoControls
+// let playButton
 let info
 let tempVideo
 const init = () => {
   info = document.getElementById('info')
   player = document.getElementById('video')
+  // videoControls = document.getElementById('video-controls')
+
+  // player.controls = false
+  // player.addEventListener('play', updatePlayState);
+  // player.addEventListener('pause', updatePlayState);
+
+  // playButton = document.getElementById('play')
+  // playButton.addEventListener('click', togglePlay);
+
   checkStream()
 }
+
+/*
+const updatePlayState = () => {
+  if (player.paused) {
+
+  } else {
+
+  }
+}
+
+const togglePlay = () => {
+  if (player.paused || player.ended) {
+    player.play()
+  } else {
+    player.pause()
+  }
+} */
 
 const checkStream = () => {
   setTimeout(function () {

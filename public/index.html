@@ -74,18 +74,13 @@
       position: absolute;
       top: 300px;
       width: 100%;
-      height:32px;
+      height:40px;
       background-color:#333;
       color:white;
       padding:10px;
     }
 
-    #debug {
-      position: absolute;
-      top: 332px;
-      bottom: 0px;
-      width: 100%;
-    }
+   
 
     #content {
       position: absolute;
@@ -97,31 +92,37 @@
       overflow-y: auto;
     }
 
+    .column{
+      width:33.33%;
+    }
    .list {
       list-style: none;
-      width: 25%;
       display: block;
       position: absolute;
       top: 0;
       bottom:0;
       overflow-y:auto;
+      background-color:#111;
     }
 
     #searchresults{
       left:0;
+      
     }
     
     #torrents {
-      left:50%;
+      left:33.33%;
     }
 
     #files {
       right:0;
-      background-color: #e5e5e5;
     }
 
     #queue {
-      left:25%;
+      left:0;
+      width:100%;
+      bottom:0;
+      top:340px;
       color:white;
       background-color:#222;
     }
@@ -183,16 +184,12 @@
       </div>
       <div id="info"></div>
       <div id="debug"></div>
+      <ul id='queue' class='list'></ul>
     </div>
     <div id="content">
-      <ul id='searchresults' class='list'>
-      </ul>
-      <ul id='torrents' class='list'>
-      </ul>
-      <ul id='queue' class='list'>
-      </ul>
-      <ul id='files' class='list'>
-      </ul>
+      <ul id='searchresults' class='list column'></ul>
+      <ul id='torrents' class='list column'></ul>
+      <ul id='files' class='list column'></ul>
       
     </div>
   </div>

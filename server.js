@@ -4,14 +4,14 @@ const bodyParser = require('body-parser')
 const WebTorrent = require('webtorrent')
 const TorrentIndexer = require('torrent-indexer')
 
-const TorrentSearchApi = require('torrent-search-api')
+/* const TorrentSearchApi = require('torrent-search-api')
 TorrentSearchApi.enableProvider('ThePirateBay')
 TorrentSearchApi.enableProvider('1337x')
 TorrentSearchApi.enableProvider('Torrentz2')
 TorrentSearchApi.enableProvider('KickassTorrents')
 TorrentSearchApi.enableProvider('Rarbg')
 TorrentSearchApi.enableProvider('Yts')
-TorrentSearchApi.enableProvider('Eztv')
+TorrentSearchApi.enableProvider('Eztv') */
 
 const client = new WebTorrent()
 
@@ -94,9 +94,9 @@ app.get('/searchtorrent/:search', async function (req, res) {
   const query = data.query + ' x264 webrip'
   console.log(query)
 
-  const torrents = await TorrentSearchApi.search(query, data.type, 20)
-  console.log('TorrentSearchApi')
-  console.log(torrents)
+  // const torrents = await TorrentSearchApi.search(query, data.type, 20)
+  // console.log('TorrentSearchApi')
+  // console.log(torrents)
 
   const results = await search(query, data.type)
   console.log('TorrentIndexer')
