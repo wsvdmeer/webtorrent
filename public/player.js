@@ -17,7 +17,7 @@ const checkStream = () => {
         if (xhr.responseText) {
           const result = JSON.parse(xhr.responseText)
           if (result.hash && result.filename) {
-            const currentVideo = '/stream/' + result.hash + '/' + result.filenames
+            const currentVideo = '/stream/' + result.hash + '/' + result.filename
             if (tempVideo !== currentVideo) {
               player.removeAttribute('src')
               tempVideo = currentVideo

@@ -51,18 +51,18 @@ client.on('error', function (err) {
 app.get('/search/:search', function (req, res, next) {
   const data = JSON.parse(req.params.search)
 
-  let img
-  // if (data.type === 'tv') {
   const result = {
     title: '',
     poster: '',
     results: [],
-    type: ''
+    type: '',
+    year: ''
   }
+
   imdbClient.get({ name: data.query }).then((search) => {
     result.poster = search.poster
     result.title = search.name
-    img = search.poster
+    result.year = search.year
     switch (search.constructor.name) {
       case 'Movie':
         result.type = 'movie'
@@ -76,7 +76,7 @@ app.get('/search/:search', function (req, res, next) {
       const episodes = []
       eps.forEach((item) => {
         if (item.poster === undefined) {
-          item.poster = img
+          item.poster = result.poster
         }
         episodes.push(item)
       })
@@ -94,7 +94,7 @@ app.get('/searchtorrent/:search', async function (req, res) {
   const query = data.query + ' x264 webrip'
   console.log(query)
 
-  const torrents = await TorrentSearchApi.search(query, 'TV', 20)
+  const torrents = await TorrentSearchApi.search(query, data.type, 20)
   console.log('TorrentSearchApi')
   console.log(torrents)
 
@@ -147,8 +147,8 @@ app.get('/add/:torrent', async function (req, res) {
   if (url) {
     if (url.match(/magnet:\?xt=urn:[a-z0-9]+:[a-z0-9]{32}/i) === null) {
       // no a magnet link
-      // magnet = await torrentIndexer.torrent(url)
-      magnet = await TorrentSearchApi.getMagnet(url)
+      magnet = await torrentIndexer.torrent(url)
+      // magnet = await TorrentSearchApi.getMagnet(url)
       console.log(`converted from link : ${magnet}`)
     }
 
@@ -203,7 +203,11 @@ app.get('/stream/:magnet/:filename', async function (req, res, next) {
   const filename = req.params.filename // data.file
   const torrent = client.get(magnet)
   let file = {}
-
+  if (!torrent) {
+    const err = new Error('Torrent null')
+    err.status = 405
+    next(err)
+  }
   torrent.files.forEach((torrent) => {
     if (torrent.name === filename) {
       file = torrent

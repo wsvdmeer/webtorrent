@@ -153,7 +153,7 @@ const search = () => {
               const query = `${result.title} ${s}${e}`
 
               li.setAttribute('query', query)
-
+              li.setAttribute('type', result.type)
               searchResults.appendChild(li)
               li.addEventListener('click', searchTorrent)
             })
@@ -166,11 +166,16 @@ const search = () => {
             const title = document.createElement('h2')
             title.innerText = result.title
 
+            const info = document.createElement('span')
+            info.innerText = result.year
+
             li.appendChild(img)
             li.appendChild(title)
+            li.appendChild(info)
 
-            const query = `${result.title}`
+            const query = `${result.title} ${result.year}`
             li.setAttribute('query', query)
+            li.setAttribute('type', result.type)
             searchResults.appendChild(li)
             li.addEventListener('click', searchTorrent)
           }
@@ -181,8 +186,8 @@ const search = () => {
   }
 }
 const searchTorrent = (event) => {
-  console.log(`Search for torrent ${event.target.getAttribute('query')} ${type.value}`)
-  searchTorrents(event.target.getAttribute('query'), type.value)
+  console.log(`Search for torrent ${event.target.getAttribute('query')} ${event.target.getAttribute('type')}`)
+  searchTorrents(event.target.getAttribute('query'), event.target.getAttribute('type'))
 }
 // SEARCH TORRENT
 const searchTorrents = (search, type) => {
