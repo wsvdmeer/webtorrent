@@ -20,7 +20,7 @@ const app = express()
 const router = express.Router()
 const torrentIndexer = new TorrentIndexer()
 const port = process.env.PORT || 4000
-const fileTypes = ['mp4', 'mkv']
+const fileTypes = ['mp4', '.m4v', '.m4a']
 let currentStream = {
   hash: '',
   filename: ''
@@ -119,8 +119,8 @@ const search = async (query, type) => {
 }
 
 const getVideos = (files) => {
+  const videos = []
   if (files && files.length > 0) {
-    const videos = []
     files.forEach((file) => {
       console.log(file)
       fileTypes.forEach((item) => {
@@ -130,18 +130,46 @@ const getVideos = (files) => {
       })
     })
     console.log('autoplay : ' + videos)
-    return videos
+  }
+  return videos
+}
+
+const removeTorrent = async (url) => {
+  let magnet = url
+  if (url) {
+    if (url.match(/magnet:\?xt=urn:[a-z0-9]+:[a-z0-9]{32}/i) === null) {
+      magnet = await torrentIndexer.torrent(url)
+      console.log(`converted from link : ${magnet}`)
+    }
+    console.log('client remove : ' + magnet)
+    // client.remove(id)
+    const torrent = client.get(magnet)
+    const path = torrent.path
+
+    client.remove(magnet, function (error) {
+      if (!error) {
+        try {
+          fs.rmdirSync(path, { recursive: true })
+          console.log(`${path} is deleted!`)
+          return true
+        } catch (err) {
+          console.error(`Error while deleting ${path}.`)
+          return false
+        }
+      } else {
+        return false
+      }
+    })
   }
 }
 
 // REMOVE
 app.get('/remove/:torrent', async function (req, res) {
   const data = JSON.parse(req.params.torrent)
-  const id = data.id
-  if (id) {
-    console.log('client remove : ' + id)
-    // client.remove(id)
-  }
+  const url = data.url
+  const result = await removeTorrent(url)
+  res.status(200)
+  res.json(result)
 })
 
 // SELECT
@@ -175,7 +203,7 @@ app.get('/add/:torrent', async function (req, res) {
       }
     } else {
       console.log(`Add ${req.params.torrent}`)
-      client.add(magnet, function (torrent) {
+      client.add(magnet, async function (torrent) {
         torrent.files.forEach(function (file) {
           files.push({
             hash: torrent.infoHash,
@@ -184,8 +212,14 @@ app.get('/add/:torrent', async function (req, res) {
           })
         })
         if (files) {
-          res.status(200)
-          res.json(getVideos(files))
+          const videos = getVideos(files)
+          if (videos.length > 0) {
+            res.status(200)
+            res.json(getVideos(files))
+          } else {
+            const remove = await removeTorrent(torrent.infoHash)
+            console.log('auto remove : ' + remove)
+          }
         }
       })
     }
@@ -271,20 +305,22 @@ app.get('/info', async function (req, res, next) {
 })
 
 const checkDirectoryForTorrents = () => {
-  fs.readdir(directory, (err, files) => {
-    if (!err) {
-      files.forEach(file => {
-        const dirTorrent = client.get(file)
-        if (!dirTorrent) {
-          client.add(file, function (torrent) {
-            console.log('resume ' + torrent)
-          })
-        }
-      })
-    } else {
-      console.log(err)
-    }
-  })
+  if (fs.existsSync(directory)) {
+    fs.readdir(directory, (err, files) => {
+      if (!err) {
+        files.forEach(file => {
+          const dirTorrent = client.get(file)
+          if (!dirTorrent) {
+            client.add(file, function (torrent) {
+              console.log('resume ' + torrent)
+            })
+          }
+        })
+      } else {
+        console.log(err)
+      }
+    })
+  }
 }
 
 // LIST

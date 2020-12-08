@@ -3,7 +3,23 @@ let magnets
 const removeTorrent = (event) => {
   const url = event.target.getAttribute('url')
   console.log('remove : ' + url)
-  // destroyTorrent(link)
+  console.log(url)
+  const encodedUri = encodeURIComponent(url)
+  console.log(encodedUri)
+  const query = {
+    url: encodedUri
+  }
+  const xhr = new XMLHttpRequest()
+  xhr.open('GET', '/remove/' + JSON.stringify(query), true)
+  xhr.setRequestHeader('Content-Type', 'application/json')
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.responseText) {
+        console.log(xhr.responseText)
+      }
+    }
+  }
+  xhr.send()
 }
 
 const init = () => {
@@ -102,6 +118,8 @@ const listFiles = () => {
                 magnets.appendChild(li)
               })
             }
+          } else {
+            magnets.innerHTML = ''
           }
         }
         listFiles()
