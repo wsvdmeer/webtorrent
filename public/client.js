@@ -7,9 +7,9 @@ let torrents
 let files
 let player
 let type
-let magnets
+// let magnets
 let info
-let magnetResults
+// let magnetResults
 let searchResults
 
 const init = () => {
@@ -20,14 +20,16 @@ const init = () => {
   searchResults = document.getElementById('searchresults')
   torrents = document.getElementById('torrents')
   files = document.getElementById('files')
-  magnets = document.getElementById('queue')
+  // magnets = document.getElementById('queue')
   player = document.getElementById('video')
   info = document.getElementById('info')
 
   // events
-  button.addEventListener('click', search)
+  button.addEventListener('click', () => {
+    search(input.value)
+  })
 
-  listFiles()
+  // listFiles()
   clientData()
 
   // addTorrent(test)
@@ -36,12 +38,6 @@ const init = () => {
 const selectTorrent = (event) => {
   const link = event.target.getAttribute('url')
   addTorrent(link)
-}
-
-const removeTorrent = (event) => {
-  const link = event.target.getAttribute('url')
-  console.log('remove : ' + link)
-  // destroyTorrent(link)
 }
 
 const showFile = (event) => {
@@ -102,8 +98,8 @@ const addTorrent = (url) => {
   }
   xhr.send()
 }
-const search = () => {
-  if (input.value) {
+const search = (value) => {
+  if (value) {
     button.disabled = true
     input.disabled = true
     searchResults.innerHTML = ''
@@ -124,18 +120,21 @@ const search = () => {
           const result = JSON.parse(xhr.responseText)
           if (result.type === 'tv') {
             result.results.forEach(episode => {
-              const li = document.createElement('li')
+              const li = document.createElement('li', { is: 'search-item' })
               const img = document.createElement('img')
               img.src = episode.poster
 
+              const content = document.createElement('div')
+              content.classList.add('content')
               const title = document.createElement('h2')
               title.innerText = episode.title
 
               const info = document.createElement('span')
 
               li.appendChild(img)
-              li.appendChild(title)
-              li.appendChild(info)
+              li.appendChild(content)
+              content.appendChild(title)
+              content.appendChild(info)
 
               // create query
               let s = `s${episode.season.toString()}`
@@ -285,6 +284,7 @@ const clientData = () => {
   }, 1000)
 }
 
+/*
 const listFiles = () => {
   setTimeout(function () {
     const xhr = new XMLHttpRequest()
@@ -342,7 +342,7 @@ const listFiles = () => {
     }
     xhr.send()
   }, 1000)
-}
+} */
 
 const formatBytes = (bytes, decimals) => {
   if (bytes === 0) {

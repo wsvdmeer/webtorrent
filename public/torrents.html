@@ -1,0 +1,41 @@
+<html>
+
+<head>
+    <script type="module" src='torrents.js'></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #eee;
+            position: relative;
+            font-size: 12px;
+        }
+
+        .list {
+            list-style: none;
+            display: block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto;
+            background-color: #111;
+        }
+
+        .list li{
+            color:white;
+            border-bottom:1px solid white;
+        }
+    </style>
+</head>
+
+<body>
+    <ul id='queue' class='list'></ul>
+</body>
+
+</html>

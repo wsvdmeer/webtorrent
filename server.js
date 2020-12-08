@@ -3,7 +3,8 @@ const path = require('path')
 const bodyParser = require('body-parser')
 const WebTorrent = require('webtorrent')
 const TorrentIndexer = require('torrent-indexer')
-
+const os = require('os')
+const fs = require('fs')
 /* const TorrentSearchApi = require('torrent-search-api')
 TorrentSearchApi.enableProvider('ThePirateBay')
 TorrentSearchApi.enableProvider('1337x')
@@ -14,7 +15,7 @@ TorrentSearchApi.enableProvider('Yts')
 TorrentSearchApi.enableProvider('Eztv') */
 
 const client = new WebTorrent()
-
+const directory = `${os.tmpdir()}/webtorrent/`
 const app = express()
 const router = express.Router()
 const torrentIndexer = new TorrentIndexer()
@@ -38,6 +39,10 @@ router.get('/', function (req, res) {
 
 router.get('/player', function (req, res) {
   res.sendFile(path.join(__dirname, 'public/player.html'))
+})
+
+router.get('/torrents', function (req, res) {
+  res.sendFile(path.join(__dirname, 'public/torrents.html'))
 })
 
 // CLIENT
@@ -252,7 +257,7 @@ app.get('/currentstream', function (req, res, next) {
     }
   }
 })
-app.get('/info', function (req, res, next) {
+app.get('/info', async function (req, res, next) {
   if (client) {
     const data = {
       downloadSpeed: client.downloadSpeed,
@@ -265,8 +270,26 @@ app.get('/info', function (req, res, next) {
   }
 })
 
+const checkDirectoryForTorrents = () => {
+  fs.readdir(directory, (err, files) => {
+    if (!err) {
+      files.forEach(file => {
+        const dirTorrent = client.get(file)
+        if (!dirTorrent) {
+          client.add(file, function (torrent) {
+            console.log('resume ' + torrent)
+          })
+        }
+      })
+    } else {
+      console.log(err)
+    }
+  })
+}
+
 // LIST
 app.get('/list', function (req, res, next) {
+  checkDirectoryForTorrents()
   const torrent = client.torrents.reduce(function (array, data) {
     array.push({
       infoHash: data.infoHash,

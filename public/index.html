@@ -1,7 +1,10 @@
 <html>
 
 <head>
+  
   <script type="module" src='client.js'></script>
+  <script type="module" src="components/SearchItem/SearchItem.js"></script>
+  
   <style>
     * {
       margin: 0;
@@ -136,18 +139,27 @@
     }
 
     .list li{
-      padding: 10px;
+      width:100%;
       cursor: pointer;
       overflow-wrap: break-word;
       margin-bottom:5px;
-      background-color:#fff;
-      border-radius:5px;
-      color:#000;
+      color:#fff;
+      overflow:hidden;
+      position: relative;
+      display:flex;
+
+    }
+
+    .list li .content{
+      display: flex;
+      flex-direction: column;
+      padding:10px;
     }
 
     .list li img{
-      width:100px;
+      width:30%;
       height:auto;
+      border-radius: 10px;;
     }
 
     .list li span{
@@ -184,7 +196,7 @@
       </div>
       <div id="info"></div>
       <div id="debug"></div>
-      <ul id='queue' class='list'></ul>
+     
     </div>
     <div id="content">
       <ul id='searchresults' class='list column'></ul>
