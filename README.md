@@ -65,4 +65,7 @@ git clone https://github.com/wsvdmeer/webtorrent.git
 cd webtorrent
 npm install
 
+## Start server
+node server
+
 

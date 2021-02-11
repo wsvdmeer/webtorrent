@@ -7,30 +7,23 @@ const os = require('os')
 const fs = require('fs')
 const https = require('https')
 
-/* const TorrentSearchApi = require('torrent-search-api')
-TorrentSearchApi.enableProvider('ThePirateBay')
-TorrentSearchApi.enableProvider('1337x')
-TorrentSearchApi.enableProvider('Torrentz2')
-TorrentSearchApi.enableProvider('KickassTorrents')
-TorrentSearchApi.enableProvider('Rarbg')
-TorrentSearchApi.enableProvider('Yts')
-TorrentSearchApi.enableProvider('Eztv') */
-
 // IP
-
-const options = new URL('https://ifconfig.me/all.json')
-const myRequest = https.request(options, res => {
+// const options = new URL('https://ifconfig.me/all.json')
+const options = new URL('https://www.trackip.net/ip?json')
+const ip4 = Object.values(os.networkInterfaces()).flat().find(i => i.family === 'IPv4' && !i.internal).address
+const externalIPRequest = https.request(options, res => {
   let data = ''
   res.on('data', (chunk) => {
     data += chunk
   })
   res.on('end', () => {
-    console.log(JSON.parse(data))
+    const json = JSON.parse(data)
+    console.log(`External ip address : ${json.IP}`)
+    console.log(`External ip country : ${json.Country}`)
   })
 })
-
-myRequest.on('error', (error) => { console.error(error.message) })
-myRequest.end()
+externalIPRequest.on('error', (error) => { console.error(error.message) })
+externalIPRequest.end()
 
 const client = new WebTorrent()
 const directory = `${os.tmpdir()}/webtorrent/`
@@ -370,5 +363,6 @@ app.get('/list', function (req, res, next) {
 
 app.use('/', router)
 app.listen(port, () => {
-  console.log(`Server running on :${port}`)
+  console.log(`Internal ip address : ${ip4}`)
+  console.log(`Server running on port : ${port}`)
 })
