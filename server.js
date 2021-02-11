@@ -5,6 +5,7 @@ const WebTorrent = require('webtorrent')
 const TorrentIndexer = require('torrent-indexer')
 const os = require('os')
 const fs = require('fs')
+const http = require('http')
 
 /* const TorrentSearchApi = require('torrent-search-api')
 TorrentSearchApi.enableProvider('ThePirateBay')
@@ -16,8 +17,17 @@ TorrentSearchApi.enableProvider('Yts')
 TorrentSearchApi.enableProvider('Eztv') */
 
 // IP
+const options = new URL('https://www.whatsmyip.org/')
+const myRequest = http.request(options, res => {
+  res.on('data', d => {
+    console.log(d)
+  })
+})
+myRequest.on('error', console.error)
+myRequest.end()
 
-const ip = Object.values(os.networkInterfaces()).flat().find(i => i.family === 'IPv4' && !i.internal).address
+myRequest.on('error', console.error)
+myRequest.end()
 
 const client = new WebTorrent()
 const directory = `${os.tmpdir()}/webtorrent/`
