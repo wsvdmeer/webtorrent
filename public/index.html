@@ -147,16 +147,22 @@
       overflow:hidden;
       position: relative;
       display:flex;
-
+      flex-direction: column;
     }
 
-    .list li .content{
+    
+
+    #searchResults li{
+     
+    }
+
+    #searchResults li .content{
       display: flex;
       flex-direction: column;
       padding:10px;
     }
 
-    .list li img{
+    #searchResults li img{
       width:30%;
       height:auto;
       border-radius: 10px;;
@@ -187,6 +193,10 @@
       <option value="movies">Movies</option>
     </select>
     <button id="button">Search</button>
+    <div id="menu">
+      <a href="/torrents">Torrents</a>
+      <a href="/player">Player</a>
+    </div>
   </div>
   <div id="main">
     <div id="right">

@@ -119,7 +119,7 @@ const listFiles = () => {
               })
             }
           } else {
-            magnets.innerHTML = ''
+            magnets.innerHTML = 'no torrents'
           }
         }
         listFiles()

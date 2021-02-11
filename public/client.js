@@ -25,6 +25,12 @@ const init = () => {
   info = document.getElementById('info')
 
   // events
+  input.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+      search(input.value)
+    }
+  })
+
   button.addEventListener('click', () => {
     search(input.value)
   })
