@@ -5,7 +5,7 @@ const WebTorrent = require('webtorrent')
 const TorrentIndexer = require('torrent-indexer')
 const os = require('os')
 const fs = require('fs')
-const http = require('http')
+const https = require('https')
 
 /* const TorrentSearchApi = require('torrent-search-api')
 TorrentSearchApi.enableProvider('ThePirateBay')
@@ -18,7 +18,7 @@ TorrentSearchApi.enableProvider('Eztv') */
 
 // IP
 const options = new URL('https://www.whatsmyip.org/')
-const myRequest = http.request(options, res => {
+const myRequest = https.request(options, res => {
   res.on('data', d => {
     console.log(d)
   })
