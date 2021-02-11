@@ -17,17 +17,19 @@ TorrentSearchApi.enableProvider('Yts')
 TorrentSearchApi.enableProvider('Eztv') */
 
 // IP
-const options = new URL('https://www.whatsmyip.org/')
+
+const options = new URL('https://ifconfig.me/all.json')
 const myRequest = https.request(options, res => {
-  console.log(res)
-  res.on('data', d => {
-    console.log(d)
+  let data = ''
+  res.on('data', (chunk) => {
+    data += chunk
+  })
+  res.on('end', () => {
+    console.log(JSON.parse(data))
   })
 })
-myRequest.on('error', console.error)
-myRequest.end()
 
-myRequest.on('error', console.error)
+myRequest.on('error', (error) => { console.error(error.message) })
 myRequest.end()
 
 const client = new WebTorrent()
