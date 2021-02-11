@@ -5,6 +5,7 @@ const WebTorrent = require('webtorrent')
 const TorrentIndexer = require('torrent-indexer')
 const os = require('os')
 const fs = require('fs')
+
 /* const TorrentSearchApi = require('torrent-search-api')
 TorrentSearchApi.enableProvider('ThePirateBay')
 TorrentSearchApi.enableProvider('1337x')
@@ -13,6 +14,10 @@ TorrentSearchApi.enableProvider('KickassTorrents')
 TorrentSearchApi.enableProvider('Rarbg')
 TorrentSearchApi.enableProvider('Yts')
 TorrentSearchApi.enableProvider('Eztv') */
+
+// IP
+
+const ip = Object.values(os.networkInterfaces()).flat().find(i => i.family === 'IPv4' && !i.internal).address
 
 const client = new WebTorrent()
 const directory = `${os.tmpdir()}/webtorrent/`
@@ -353,4 +358,5 @@ app.get('/list', function (req, res, next) {
 app.use('/', router)
 app.listen(port, () => {
   console.log(`Server running on :${port}`)
+  console.log(`outgoing ip address : ${ip}`)
 })
