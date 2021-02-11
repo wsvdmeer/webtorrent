@@ -19,6 +19,7 @@ TorrentSearchApi.enableProvider('Eztv') */
 // IP
 const options = new URL('https://www.whatsmyip.org/')
 const myRequest = https.request(options, res => {
+  console.log(res)
   res.on('data', d => {
     console.log(d)
   })
