@@ -1,5 +1,5 @@
 // import { json } from 'express'
-const searchService = require('searchservice')
+const SearchService = require('./searchservice')
 const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
@@ -47,6 +47,8 @@ const imdb = require('imdb-api')
 const omdbApiKey = 'e21a3e3d'
 const imdbClient = new imdb.Client({ apiKey: omdbApiKey })
 
+const searchService = new SearchService()
+
 // INDEX
 app.use(express.static('public'))
 app.use(bodyParser.json())
@@ -71,51 +73,13 @@ client.on('error', function (err) {
 
 // SEARCH
 app.get('/search/:search', async function (req, res, next) {
-  const result = await searchService.search(req.params.search)
-  if (result.status === 200) {
+  await searchService.search(req.params.search, (result) => {
     res.send(JSON.stringify(result))
-  } else {
-    next(result.message)
-  }
-  /* const data = JSON.parse(req.params.search)
-
-  const result = {
-    title: '',
-    poster: '',
-    results: [],
-    type: '',
-    year: ''
-  }
-
-  imdbClient.get({ name: data.query }).then((search) => {
-    result.poster = search.poster
-    result.title = search.name
-    result.year = search.year
-    switch (search.constructor.name) {
-      case 'Movie':
-        result.type = 'movie'
-        break
-      case 'TVShow':
-        result.type = 'tv'
-        return search.episodes()
-    }
-  }).then((eps) => {
-    if (eps) {
-      const episodes = []
-      eps.forEach((item) => {
-        console.log(item)
-        if (item.poster === undefined) {
-          item.poster = result.poster
-        }
-        episodes.push(item)
-      })
-      result.results = episodes
-    }
-    console.log(result)
-    res.send(JSON.stringify(result))
-  }).catch((error) => {
-    next(error)
-  }) */
+    // if (result.status === 200) {
+    // } else {
+    // next(result.message)
+    // }
+  })
 })
 
 app.get('/searchtorrent/:search', async function (req, res) {
