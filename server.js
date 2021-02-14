@@ -1,3 +1,5 @@
+// import { json } from 'express'
+const searchService = require('searchservice')
 const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
@@ -68,8 +70,14 @@ client.on('error', function (err) {
 })
 
 // SEARCH
-app.get('/search/:search', function (req, res, next) {
-  const data = JSON.parse(req.params.search)
+app.get('/search/:search', async function (req, res, next) {
+  const result = await searchService.search(req.params.search)
+  if (result.status === 200) {
+    res.send(JSON.stringify(result))
+  } else {
+    next(result.message)
+  }
+  /* const data = JSON.parse(req.params.search)
 
   const result = {
     title: '',
@@ -107,7 +115,7 @@ app.get('/search/:search', function (req, res, next) {
     res.send(JSON.stringify(result))
   }).catch((error) => {
     next(error)
-  })
+  }) */
 })
 
 app.get('/searchtorrent/:search', async function (req, res) {
