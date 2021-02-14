@@ -20,10 +20,8 @@
         .list {
             list-style: none;
             display: block;
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            right:0;
+            width:100%;
+            height:100%;
             overflow-y: auto;
             background-color: #111;
         }
@@ -31,6 +29,18 @@
         .list li{
             color:white;
             border-bottom:1px solid white;
+        }
+
+        .list li h2{
+            font-size:2rem;
+        }
+
+        .list  li div{
+            word-wrap: break-word;
+        }
+        .list li span{
+            overflow-x:hidden;
+            
         }
     </style>
 </head>

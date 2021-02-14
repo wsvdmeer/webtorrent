@@ -2,10 +2,10 @@
 // https://github.com/davidgatti/How-to-Stream-Torrents-using-NodeJS/blob/405c8eb93a4a8f7aa83ccba98d4d3bbf08fa2052/routes/video.js
 let button
 let input
-let debug
+// let debug
 let torrents
 let files
-let player
+// let player
 let type
 // let magnets
 let info
@@ -13,7 +13,7 @@ let info
 let searchResults
 
 const init = () => {
-  debug = document.getElementById('debug')
+  // debug = document.getElementById('debug')
   type = document.getElementById('type')
   button = document.getElementById('button')
   input = document.getElementById('input')
@@ -21,7 +21,7 @@ const init = () => {
   torrents = document.getElementById('torrents')
   files = document.getElementById('files')
   // magnets = document.getElementById('queue')
-  player = document.getElementById('video')
+  // player = document.getElementById('video')
   info = document.getElementById('info')
 
   // events
@@ -54,7 +54,7 @@ const showFile = (event) => {
 // SEARCH
 const streamTorrent = (hash, file) => {
   // play here
-  player.setAttribute('src', '/stream/' + hash + '/' + file)
+  // player.setAttribute('src', '/stream/' + hash + '/' + file)
 
   // send current file to other clients
   const xhr = new XMLHttpRequest()
@@ -114,7 +114,7 @@ const search = (value) => {
       query: input.value,
       page: 1
     }
-    log('Search imdb' + input.value)
+    console.log('Search imdb' + input.value)
     const xhr = new XMLHttpRequest()
     xhr.open('GET', '/search/' + JSON.stringify(query), true)
     xhr.setRequestHeader('Content-Type', 'application/json')
@@ -126,7 +126,8 @@ const search = (value) => {
           const result = JSON.parse(xhr.responseText)
           if (result.type === 'tv') {
             result.results.forEach(episode => {
-              const li = document.createElement('li', { is: 'search-item' })
+              // const li = document.createElement('li', { is: 'search-item' }) // pwa
+              const li = document.createElement('li')
               const img = document.createElement('img')
               img.src = episode.poster
 
@@ -205,7 +206,7 @@ const searchTorrents = (search, type) => {
       query: search,
       page: 1
     }
-    log(`Search torrent ${query.type} ${query.query}`)
+    console.log(`Search torrent ${query.type} ${query.query}`)
 
     const li = document.createElement('li')
     const title = document.createElement('h2')
@@ -281,7 +282,7 @@ const clientData = () => {
         if (xhr.responseText) {
           console.log(this.responseText)
           const result = JSON.parse(xhr.responseText)
-          info.innerText = `d ${result.downloadSpeed} u ${result.uploadSpeed} r ${result.ratio} p ${result.progress}`
+          info.innerText = `download : ${result.downloadSpeed} upload : ${result.uploadSpeed} ratio :  ${result.ratio} progress ${result.progress}`
         }
         clientData()
       }
@@ -361,7 +362,4 @@ const formatBytes = (bytes, decimals) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
-function log (value) {
-  debug.innerHTML += value + '<br/>'
-}
 document.addEventListener('DOMContentLoaded', init)

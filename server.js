@@ -42,16 +42,19 @@ const imdb = require('imdb-api')
 const omdbApiKey = 'e21a3e3d'
 const imdbClient = new imdb.Client({ apiKey: omdbApiKey })
 
+// INDEX
 app.use(express.static('public'))
 app.use(bodyParser.json())
 router.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, 'public/index.html'))
 })
 
+// PLAYER
 router.get('/player', function (req, res) {
   res.sendFile(path.join(__dirname, 'public/player.html'))
 })
 
+// TORRENTS
 router.get('/torrents', function (req, res) {
   res.sendFile(path.join(__dirname, 'public/torrents.html'))
 })
@@ -60,8 +63,6 @@ router.get('/torrents', function (req, res) {
 client.on('error', function (err) {
   console.error('ERROR: ' + err.message)
 })
-
-// FIND
 
 // SEARCH
 app.get('/search/:search', function (req, res, next) {
@@ -91,6 +92,7 @@ app.get('/search/:search', function (req, res, next) {
     if (eps) {
       const episodes = []
       eps.forEach((item) => {
+        console.log(item)
         if (item.poster === undefined) {
           item.poster = result.poster
         }

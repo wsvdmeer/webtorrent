@@ -52,35 +52,17 @@
       width: 100%;
       position: absolute;
       top: 100px;
-      bottom: 0px;
-    }
-
-    #right {
-      height: 100%;
-      width: 300px;
-      position: absolute;
-      right: 0px;
-      top: 0px;
-      background-color: #ccc;
-      overflow-y: auto;
-    }
-
-    #player {
-      position: absolute;
-      width: 300px;
-      height: 300px;
-      top: 0;
-      left: 0;
+      bottom: 3rem;
     }
 
     #info {
       position: absolute;
-      top: 300px;
+      bottom: 0;
       width: 100%;
-      height:40px;
+      height:3rem;
       background-color:#333;
       color:white;
-      padding:10px;
+      padding:0.5rem;
     }
 
    
@@ -91,7 +73,7 @@
       bottom: 0;
       left: 0;
       bottom: 0px;
-      right: 300px;
+      right: 0px;
       overflow-y: auto;
     }
 
@@ -142,32 +124,30 @@
       width:100%;
       cursor: pointer;
       overflow-wrap: break-word;
-      margin-bottom:5px;
       color:#fff;
       overflow:hidden;
       position: relative;
-      display:flex;
-      flex-direction: column;
+      border-bottom:1px solid rgba(255,255,255,0.5);
+     
     }
 
     #searchResults li .content{
-      display: flex;
-      flex-direction: column;
-      padding:10px;
+      
+      padding:0.5rem;
     }
 
     #searchResults li img{
-      width:30%;
+      width:6rem;
       height:auto;
-      border-radius: 10px;;
+    
     }
 
     .list li span{
-      font-size: 13px;
+      font-size: 1rem;
     }
 
     .list li h2{
-      font-size: 15px;
+      font-size: 1.2rem;
     }
 
     .file,
@@ -191,17 +171,10 @@
       <a href="/torrents">Torrents</a>
       <a href="/player">Player</a>
     </div>
+   
   </div>
   <div id="main">
-    <div id="right">
-      <div id="player">
-        <video id="video" controls autoplay width="300" height="300">
-        </video>
-      </div>
-      <div id="info"></div>
-      <div id="debug"></div>
-     
-    </div>
+  
     <div id="content">
       <ul id='searchresults' class='list column'></ul>
       <ul id='torrents' class='list column'></ul>
@@ -209,6 +182,7 @@
       
     </div>
   </div>
+  <div id="info"></div>
 </body>
 
 </html>

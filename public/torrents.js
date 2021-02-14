@@ -46,6 +46,8 @@ const selectTorrent = (event) => {
         console.log(results)
         // autoplay first item
         streamTorrent(results[0].hash, results[0].name)
+
+        window.location.href = '/player'
       }
     }
   }
@@ -89,7 +91,7 @@ const listFiles = () => {
                 title.innerText = item.name
                 li.appendChild(title)
 
-                const infoList = document.createElement('span')
+                const infoList = document.createElement('div')
                 li.appendChild(infoList)
 
                 const remove = document.createElement('button')
