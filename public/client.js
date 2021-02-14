@@ -282,7 +282,7 @@ const clientData = () => {
         if (xhr.responseText) {
           console.log(this.responseText)
           const result = JSON.parse(xhr.responseText)
-          info.innerText = `download : ${result.downloadSpeed} upload : ${result.uploadSpeed} ratio :  ${result.ratio} progress ${result.progress}`
+          info.innerText = `NETWORK [ external ip : ${result.network.externalip} country : ${result.network.country} internal ip ${result.network.internalip} port : ${result.network.port} ]  ACTIVITY [ download : ${result.downloadSpeed} upload : ${result.uploadSpeed} ratio :  ${result.ratio} progress ${result.progress} ]`
         }
         clientData()
       }

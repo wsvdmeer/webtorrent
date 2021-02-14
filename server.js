@@ -7,24 +7,6 @@ const os = require('os')
 const fs = require('fs')
 const https = require('https')
 
-// IP
-// const options = new URL('https://ifconfig.me/all.json')
-const options = new URL('https://www.trackip.net/ip?json')
-const ip4 = Object.values(os.networkInterfaces()).flat().find(i => i.family === 'IPv4' && !i.internal).address
-const externalIPRequest = https.request(options, res => {
-  let data = ''
-  res.on('data', (chunk) => {
-    data += chunk
-  })
-  res.on('end', () => {
-    const json = JSON.parse(data)
-    console.log(`External ip address : ${json.IP}`)
-    console.log(`External ip country : ${json.Country}`)
-  })
-})
-externalIPRequest.on('error', (error) => { console.error(error.message) })
-externalIPRequest.end()
-
 const client = new WebTorrent()
 const directory = `${os.tmpdir()}/webtorrent/`
 const app = express()
@@ -36,6 +18,27 @@ let currentStream = {
   hash: '',
   filename: ''
 }
+
+// IP
+// const options = new URL('https://ifconfig.me/all.json')
+const options = new URL('https://www.trackip.net/ip?json')
+const ip4 = Object.values(os.networkInterfaces()).flat().find(i => i.family === 'IPv4' && !i.internal).address
+const networkInfo = { externalip: '', country: '', internalip: ip4, port: port }
+const externalIPRequest = https.request(options, res => {
+  let data = ''
+  res.on('data', (chunk) => {
+    data += chunk
+  })
+  res.on('end', () => {
+    const json = JSON.parse(data)
+    console.log(`External ip address : ${json.IP}`)
+    console.log(`External ip country : ${json.Country}`)
+    networkInfo.externalip = json.IP
+    networkInfo.country = json.Country
+  })
+})
+externalIPRequest.on('error', (error) => { console.error(error.message) })
+externalIPRequest.end()
 
 // IMDB
 const imdb = require('imdb-api')
@@ -310,7 +313,8 @@ app.get('/info', async function (req, res, next) {
       downloadSpeed: client.downloadSpeed,
       uploadSpeed: client.uploadSpeed,
       progress: client.progress,
-      ratio: client.ratio
+      ratio: client.ratio,
+      network: networkInfo
     }
     res.status(200)
     res.json(data)
