@@ -47,7 +47,7 @@ const selectTorrent = (event) => {
         // autoplay first item
         streamTorrent(results[0].hash, results[0].name)
 
-        window.location.href = '/player'
+        // window.location.href = '/player'
       }
     }
   }
