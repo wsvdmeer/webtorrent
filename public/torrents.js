@@ -2,8 +2,6 @@ let magnetResults
 let magnets
 const removeTorrent = (event) => {
   const url = event.target.getAttribute('url')
-  console.log('remove : ' + url)
-  console.log(url)
   const encodedUri = encodeURIComponent(url)
   const query = {
     url: encodedUri
