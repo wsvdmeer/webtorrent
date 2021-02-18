@@ -5,7 +5,6 @@ const removeTorrent = (event) => {
   console.log('remove : ' + url)
   console.log(url)
   const encodedUri = encodeURIComponent(url)
-  console.log(encodedUri)
   const query = {
     url: encodedUri
   }
@@ -81,8 +80,8 @@ const listFiles = () => {
           if (results.length > 0) {
             if (JSON.stringify(results) !== JSON.stringify(magnetResults)) {
               magnetResults = results
-              console.log('different')
-              console.log(results)
+              // console.log('different')
+              // console.log(results)
               magnets.innerHTML = ''
               magnetResults.forEach(item => {
                 const li = document.createElement('li')
