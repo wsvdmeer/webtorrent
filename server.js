@@ -1,21 +1,24 @@
-// import { json } from 'express'
-const SearchService = require('./searchservice')
+// services
+const SearchService = require('./services/searchservice')
+const IndexerService = require('./services/indexerservice')
+const TorrentService = require('./services/torrentservice')
+const NetworkService = require('./services/networkservice')
+
 const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
-const WebTorrent = require('webtorrent')
-const TorrentIndexer = require('torrent-indexer')
-const os = require('os')
-const fs = require('fs')
-const https = require('https')
+// const WebTorrent = require('webtorrent')
 
-const client = new WebTorrent()
-const directory = `${os.tmpdir()}/webtorrent/`
+// const os = require('os')
+// const fs = require('fs')
+// const https = require('https')
+
+// const client = new WebTorrent()
+// const directory = `${os.tmpdir()}/webtorrent/`
 const app = express()
 const router = express.Router()
-const torrentIndexer = new TorrentIndexer()
 const port = process.env.PORT || 4000
-const fileTypes = ['mp4', '.m4v', '.m4a']
+// const fileTypes = ['mp4', '.m4v', '.m4a']
 let currentStream = {
   hash: '',
   filename: ''
@@ -23,7 +26,7 @@ let currentStream = {
 
 // IP
 // const options = new URL('https://ifconfig.me/all.json')
-const options = new URL('https://www.trackip.net/ip?json')
+/* const options = new URL('https://www.trackip.net/ip?json')
 const ip4 = Object.values(os.networkInterfaces()).flat().find(i => i.family === 'IPv4' && !i.internal).address
 const networkInfo = { externalip: '', country: '', internalip: ip4, port: port }
 const externalIPRequest = https.request(options, res => {
@@ -40,15 +43,16 @@ const externalIPRequest = https.request(options, res => {
   })
 })
 externalIPRequest.on('error', (error) => { console.error(error.message) })
-externalIPRequest.end()
-
-// IMDB
-const imdb = require('imdb-api')
-const omdbApiKey = 'e21a3e3d'
-const imdbClient = new imdb.Client({ apiKey: omdbApiKey })
+externalIPRequest.end() */
 
 const searchService = new SearchService()
-
+const indexerService = new IndexerService()
+const torrentService = new TorrentService(indexerService)
+const networkService = new NetworkService()
+let networkInfo
+networkService.getNetworkInfo((result) => {
+  networkInfo = result
+})
 // INDEX
 app.use(express.static('public'))
 app.use(bodyParser.json())
@@ -67,9 +71,9 @@ router.get('/torrents', function (req, res) {
 })
 
 // CLIENT
-client.on('error', function (err) {
+/* client.on('error', function (err) {
   console.error('ERROR: ' + err.message)
-})
+}) */
 
 // SEARCH
 app.get('/search/:search', async function (req, res, next) {
@@ -83,15 +87,7 @@ app.get('/search/:search', async function (req, res, next) {
 })
 
 app.get('/searchtorrent/:search', async function (req, res) {
-  const data = JSON.parse(req.params.search)
-  const query = data.query + ' x264 webrip'
-  console.log(query)
-
-  // const torrents = await TorrentSearchApi.search(query, data.type, 20)
-  // console.log('TorrentSearchApi')
-  // console.log(torrents)
-
-  const results = await search(query, data.type)
+  const results = await indexerService.search(req.params.search)
   console.log('TorrentIndexer')
   console.log(results)
   if (results.length > 0) {
@@ -100,12 +96,7 @@ app.get('/searchtorrent/:search', async function (req, res) {
   res.send(JSON.stringify(results))
 })
 
-const search = async (query, type) => {
-  console.log(`Searching for : ${query} ${type}`)
-  const searchResults = await torrentIndexer.search(query, type, 1)
-  return searchResults
-}
-
+/*
 const getVideos = (files) => {
   const videos = []
   if (files && files.length > 0) {
@@ -120,13 +111,13 @@ const getVideos = (files) => {
     console.log('autoplay : ' + videos)
   }
   return videos
-}
+} */
 
-const removeTorrent = async (url) => {
+/* const removeTorrent = async (url) => {
   let magnet = url
   if (url) {
     if (url.match(/magnet:\?xt=urn:[a-z0-9]+:[a-z0-9]{32}/i) === null) {
-      magnet = await torrentIndexer.torrent(url)
+      magnet = await indexerService.getMagnet(url)// await torrentIndexer.torrent(url)
       console.log(`converted from link : ${magnet}`)
     }
     console.log('client remove : ' + magnet)
@@ -149,26 +140,29 @@ const removeTorrent = async (url) => {
       }
     })
   }
-}
+} */
 
 // REMOVE
 app.get('/remove/:torrent', async function (req, res) {
-  const data = JSON.parse(req.params.torrent)
-  const url = data.url
-  const result = await removeTorrent(url)
+  const result = await torrentService.removeTorrent(req.param.torrent)
   res.status(200)
   res.json(result)
 })
 
 // SELECT
 app.get('/add/:torrent', async function (req, res) {
+  await torrentService.addTorrent(req.params.torrent, (result) => {
+    res.status(result.status)
+    res.json(result.json)
+  })
+  /*
   const data = JSON.parse(req.params.torrent)
   const url = data.url
   let magnet = url
   if (url) {
     if (url.match(/magnet:\?xt=urn:[a-z0-9]+:[a-z0-9]{32}/i) === null) {
       // no a magnet link
-      magnet = await torrentIndexer.torrent(url)
+      magnet = await indexerService.getMagnet(url)
       // magnet = await TorrentSearchApi.getMagnet(url)
       console.log(`converted from link : ${magnet}`)
     }
@@ -211,7 +205,7 @@ app.get('/add/:torrent', async function (req, res) {
         }
       })
     }
-  }
+  } */
 })
 
 app.get('/setstream/:magnet/:filename', async function (req, res, next) {
@@ -228,7 +222,7 @@ app.get('/setstream/:magnet/:filename', async function (req, res, next) {
 app.get('/stream/:magnet/:filename', async function (req, res, next) {
   const magnet = req.params.magnet // data.hash
   const filename = req.params.filename // data.file
-  const torrent = client.get(magnet)
+  const torrent = torrentService.getTorrent(magnet)// client.get(magnet)
   let file = {}
   if (!torrent) {
     const err = new Error('Torrent null')
@@ -280,7 +274,17 @@ app.get('/currentstream', function (req, res, next) {
   }
 })
 app.get('/info', async function (req, res, next) {
-  if (client) {
+  const torrentInfo = torrentService.getTorrentsInfo()
+
+  const data = {
+    network: networkInfo,
+    torrents: torrentInfo
+  }
+
+  res.status(200)
+  res.json(data)
+
+  /* if (client) {
     const data = {
       downloadSpeed: client.downloadSpeed,
       uploadSpeed: client.uploadSpeed,
@@ -290,9 +294,10 @@ app.get('/info', async function (req, res, next) {
     }
     res.status(200)
     res.json(data)
-  }
+  } */
 })
 
+/*
 const checkDirectoryForTorrents = () => {
   if (fs.existsSync(directory)) {
     fs.readdir(directory, (err, files) => {
@@ -310,11 +315,11 @@ const checkDirectoryForTorrents = () => {
       }
     })
   }
-}
+} */
 
 // LIST
 app.get('/list', function (req, res, next) {
-  checkDirectoryForTorrents()
+  /* checkDirectoryForTorrents()
   const torrent = client.torrents.reduce(function (array, data) {
     array.push({
       infoHash: data.infoHash,
@@ -334,13 +339,13 @@ app.get('/list', function (req, res, next) {
     })
 
     return array
-  }, [])
+  }, []) */
+  const torrents = torrentService.getTorrents()
   res.status(200)
-  res.json(torrent)
+  res.json(torrents)
 })
 
 app.use('/', router)
 app.listen(port, () => {
-  console.log(`Internal ip address : ${ip4}`)
   console.log(`Server running on port : ${port}`)
 })
