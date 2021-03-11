@@ -32,7 +32,6 @@ class SearchService {
       if (eps) {
         const episodes = []
         eps.forEach((item) => {
-          // console.log(item)
           if (item.poster === undefined) {
             item.poster = result.poster
           }

@@ -68,4 +68,8 @@ npm install
 ## Start server
 node server
 
+## Hot reload
+npm install --save-dev nodemon
+nodemon server
+
 

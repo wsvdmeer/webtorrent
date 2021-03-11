@@ -1,4 +1,5 @@
 // services
+const OMDBService = require('./services/omdbservice')
 const SearchService = require('./services/searchservice')
 const IndexerService = require('./services/indexerservice')
 const TorrentService = require('./services/torrentservice')
@@ -11,6 +12,7 @@ const app = express()
 const router = express.Router()
 const port = process.env.PORT || 4000
 
+const omdbService = new OMDBService()
 const searchService = new SearchService()
 const indexerService = new IndexerService()
 const torrentService = new TorrentService(indexerService)
@@ -48,6 +50,10 @@ router.get('/torrents', function (req, res) {
 // ACTIONS
 // Imdb search
 app.get('/search/:search', async function (req, res, next) {
+  await omdbService.search(req.params.search, (result) => {
+    console.log(result)
+  })
+
   await searchService.search(req.params.search, (result) => {
     res.send(JSON.stringify(result))
   })
