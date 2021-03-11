@@ -42,8 +42,12 @@ const init = () => {
 }
 
 const selectTorrent = (event) => {
-  const link = event.target.getAttribute('url')
-  addTorrent(link)
+  // const link = event.target.getAttribute('url')
+  // addTorrent(link)
+  const index = event.target.getAttribute('index')
+  console.log(index)
+  getTorrentInfo(index)
+  // addTorrent(torrent)
 }
 
 const showFile = (event) => {
@@ -64,6 +68,27 @@ const streamTorrent = (hash, file) => {
     if (xhr.readyState === 4) {
       if (xhr.responseText) {
         console.log(`set : ${this.responseText}`)
+      }
+    }
+  }
+  xhr.send()
+}
+// TORRENT INFO
+const getTorrentInfo = (index) => {
+  console.log(index)
+  // const encodedUri = encodeURIComponent(url)
+  // console.log(encodedUri)
+  const query = {
+    index: index
+  }
+  const xhr = new XMLHttpRequest()
+  xhr.open('GET', '/gettorrentinfo/' + JSON.stringify(query), true)
+  xhr.setRequestHeader('Content-Type', 'application/json')
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.responseText) {
+        console.log(xhr.responseText)
+        files.innerHTML = xhr.responseText
       }
     }
   }
@@ -226,36 +251,41 @@ const searchTorrents = (search, type) => {
         if (xhr.responseText) {
           console.log(xhr.responseText)
           const results = JSON.parse(xhr.responseText)
+          let index = 0
           if (results && results.length > 0) {
             results.forEach(item => {
               console.log(item)
               const li = document.createElement('li')
-              if (item.link) {
+              /* if (item.link) {
                 li.setAttribute('url', item.link)
               }
               if (item.site) {
                 li.setAttribute('url', item.site)
-              }
+              } */
+              li.setAttribute('index', index)
 
               // title
               const title = document.createElement('h2')
-              title.innerText = item.fileName
-
+              // title.innerText = item.fileName
+              title.innerText = item.title
               // seeders
               const seeders = document.createElement('span')
-              seeders.innerText = `score ${item.score} seeders ${item.seeders} leechers ${item.leechers}`
+              // seeders.innerText = `score ${item.score} seeders ${item.seeders} leechers ${item.leechers}`
+              seeders.innerText = `size ${item.size} seeders ${item.seeds} leechers ${item.peers}`
               seeders.classList.add('seeders')
               // fileinfo
-              const file = document.createElement('span')
-              file.innerText = `size ${item.size} codec ${item.codec} resolution ${item.resolution}`
-              file.classList.add('file')
+              // const file = document.createElement('span')
+              // file.innerText = `size ${item.size} codec ${item.codec} resolution ${item.resolution}`
+              // file.innerText = `size ${item.size}`
+              // file.classList.add('file')
 
               li.appendChild(title)
-              li.appendChild(file)
+              // li.appendChild(file)
               li.appendChild(seeders)
 
               torrents.appendChild(li)
               li.addEventListener('click', selectTorrent)
+              index++
             })
           } else {
             torrents.innerHTML = ''
@@ -290,66 +320,6 @@ const clientData = () => {
     xhr.send()
   }, 1000)
 }
-
-/*
-const listFiles = () => {
-  setTimeout(function () {
-    const xhr = new XMLHttpRequest()
-    xhr.open('GET', '/list/', true)
-    xhr.setRequestHeader('Content-Type', 'application/json')
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState === 4) {
-        if (xhr.responseText) {
-          const results = JSON.parse(xhr.responseText)
-          if (results.length > 0) {
-            if (JSON.stringify(results) !== JSON.stringify(magnetResults)) {
-              magnetResults = results
-              console.log('different')
-              console.log(results)
-              magnets.innerHTML = ''
-              magnetResults.forEach(item => {
-                const li = document.createElement('li')
-
-                const title = document.createElement('h2')
-                title.innerText = item.name
-                li.appendChild(title)
-
-                const infoList = document.createElement('span')
-                li.appendChild(infoList)
-
-                const remove = document.createElement('button')
-                remove.innerText = 'Remove'
-                li.appendChild(remove)
-                remove.setAttribute('url', item.magnetUri)
-                remove.addEventListener('click', removeTorrent)
-
-                const play = document.createElement('button')
-                play.innerText = 'Play'
-                li.appendChild(play)
-                play.setAttribute('url', item.magnetUri)
-                play.addEventListener('click', selectTorrent)
-
-                let infoText = ''
-
-                for (const [key, value] of Object.entries(item)) {
-                  infoText += `${key} : ${value}\n`
-                }
-                infoList.innerText = infoText
-
-                // li.innerText = item.name + '/' + item.infoHash + '/' + item.path
-                //
-                // li.addEventListener('click', selectTorrent)
-                magnets.appendChild(li)
-              })
-            }
-          }
-        }
-        listFiles()
-      }
-    }
-    xhr.send()
-  }, 1000)
-} */
 
 const formatBytes = (bytes, decimals) => {
   if (bytes === 0) {

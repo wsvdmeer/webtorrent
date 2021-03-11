@@ -1,61 +1,13 @@
+const TorrentSearchApi = require('torrent-search-api')
 const WebTorrent = require('webtorrent')
 const fs = require('fs')
 const os = require('os')
 const client = new WebTorrent()
-let indexerService
+
 const directory = `${os.tmpdir()}/webtorrent/`
 const fileTypes = ['mp4', '.m4v', '.m4a']
-
-/*
-function getVideos (files) {
-  const videos = []
-  if (files && files.length > 0) {
-    files.forEach((file) => {
-      console.log(file)
-      fileTypes.forEach((item) => {
-        if (file.name.endsWith(item)) {
-          videos.push(file)
-        }
-      })
-    })
-    console.log('autoplay : ' + videos)
-  }
-  return videos
-} */
-
-/*
-async function removeTorrent (torrentJson) {
-  const data = JSON.parse(torrentJson)
-  const url = data.url
-  let magnet = url
-  if (url) {
-    if (url.match(/magnet:\?xt=urn:[a-z0-9]+:[a-z0-9]{32}/i) === null) {
-      magnet = await indexerService.getMagnet(url)
-      console.log(`converted from link : ${magnet}`)
-    }
-    console.log('client remove : ' + magnet)
-    const torrent = client.get(magnet)
-    const path = torrent.path
-    client.remove(magnet, function (error) {
-      if (!error) {
-        try {
-          fs.rmdirSync(path, { recursive: true })
-          console.log(`${path} is deleted!`)
-          return true
-        } catch (err) {
-          console.error(`Error while deleting ${path}.`)
-          return false
-        }
-      } else {
-        return false
-      }
-    })
-  }
-} */
-
 class TorrentService {
   constructor (indexerService) {
-    this.indexerService = indexerService
     client.on('error', function (err) {
       console.error('ERROR: ' + err.message)
     })
@@ -144,7 +96,7 @@ class TorrentService {
     let magnet = url
     if (url) {
       if (url.match(/magnet:\?xt=urn:[a-z0-9]+:[a-z0-9]{32}/i) === null) {
-        magnet = await indexerService.getMagnet(url)
+        magnet = TorrentSearchApi.getMagnet(url)// await indexerService.getMagnet(url)
         console.log(`converted from link : ${magnet}`)
       }
       console.log('client remove : ' + magnet)
@@ -199,6 +151,7 @@ class TorrentService {
           result.status = 200
           result.videos = videos
           callback(result)
+          return true
         }
       } else {
         console.log(`Add ${json}`)
@@ -220,10 +173,12 @@ class TorrentService {
               const remove = await this.removeTorrent(torrent.infoHash)
               console.log('auto remove : ' + remove)
             }
+            return true
           }
         })
       }
     }
+    return false
   }
 }
 module.exports = TorrentService

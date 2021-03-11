@@ -26,6 +26,8 @@ let currentStream = {
   filename: ''
 }
 
+let torrents = []
+
 // Index route
 app.use(express.static('public'))
 app.use(bodyParser.json())
@@ -53,6 +55,7 @@ app.get('/search/:search', async function (req, res, next) {
 // Torrent search
 app.get('/searchtorrent/:search', async function (req, res) {
   const results = await indexerService.search(req.params.search)
+  torrents = results
   console.log('TorrentIndexer')
   console.log(results)
   if (results.length > 0) {
@@ -147,6 +150,16 @@ app.get('/add/:torrent', async function (req, res) {
     res.status(result.status)
     res.json(result.json)
   })
+})
+// Torrent info
+app.get('/gettorrentinfo/:torrent', async function (req, res) {
+  const data = JSON.parse(req.params.torrent)
+  const index = data.index
+  console.log(index)
+
+  const result = await indexerService.getTorrentInfo(torrents[index])
+  res.status(200)
+  res.json(result)
 })
 // List torrents
 app.get('/list', function (req, res, next) {
