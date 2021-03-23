@@ -1,7 +1,7 @@
 // IMDB
 // const imdb = require('imdb-api')
 const http = require('http')
-const omdbApiKey = 'e21a3e3d'
+const omdbApiKey = process.env.OMDB_API_KEY
 const baseUrl = `http://www.omdbapi.com/?apikey=${omdbApiKey}`
 // const imdbClient = new imdb.Client({ apiKey: omdbApiKey })
 class OMDBService {
@@ -16,6 +16,29 @@ class OMDBService {
         try {
           const json = JSON.parse(body)
           // do something with JSON
+          console.log('episodes')
+          console.log(json)
+        } catch (error) {
+          console.error(error.message)
+        };
+      })
+    }).on('error', (error) => {
+      console.log(error)
+    })
+  }
+
+  async episode (imdbid, callback) {
+    const url = `${baseUrl}&type=episode&t=${data.query}`
+    http.get(url, (res) => {
+      let body = ''
+      res.on('data', (chunk) => {
+        body += chunk
+      })
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(body)
+          // do something with JSON
+          console.log('episodes')
           console.log(json)
         } catch (error) {
           console.error(error.message)
@@ -39,7 +62,6 @@ class OMDBService {
     }
 
     const type = 'series'
-
     const url = `${baseUrl}&type=${type}&t=${data.query}`
     console.log(url)
 
@@ -52,6 +74,7 @@ class OMDBService {
         try {
           const json = JSON.parse(body)
           // do something with JSON
+          console.log('search')
           console.log(json)
           result.poster = json.Poster
           result.title = json.Title
