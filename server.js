@@ -1,6 +1,10 @@
+// load dotenv
+const dotenv = require('dotenv')
+dotenv.config()
+
 // services
 const OMDBService = require('./services/omdbservice')
-const SearchService = require('./services/searchservice')
+// const SearchService = require('./services/searchservice')
 const IndexerService = require('./services/indexerservice')
 const TorrentService = require('./services/torrentservice')
 const NetworkService = require('./services/networkservice')
@@ -10,10 +14,10 @@ const path = require('path')
 const bodyParser = require('body-parser')
 const app = express()
 const router = express.Router()
-const port = process.env.PORT || 4000
+const port = process.env.PORT // || 4000
 
 const omdbService = new OMDBService()
-const searchService = new SearchService()
+// const searchService = new SearchService()
 const indexerService = new IndexerService()
 const torrentService = new TorrentService(indexerService)
 const networkService = new NetworkService()
@@ -49,14 +53,10 @@ router.get('/torrents', function (req, res) {
 
 // ACTIONS
 // Imdb search
-app.get('/search/:search', async function (req, res, next) {
-  await omdbService.search(req.params.search, (result) => {
-    console.log(result)
-  })
-
-  await searchService.search(req.params.search, (result) => {
-    res.send(JSON.stringify(result))
-  })
+app.get('/search/:search', async function async (req, res, next) {
+  const result = await omdbService.search(req.params.search)
+  console.log(result)
+  res.send(JSON.stringify(result))
 })
 // Torrent search
 app.get('/searchtorrent/:search', async function (req, res) {

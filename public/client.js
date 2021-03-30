@@ -2,24 +2,27 @@
 // https://github.com/davidgatti/How-to-Stream-Torrents-using-NodeJS/blob/405c8eb93a4a8f7aa83ccba98d4d3bbf08fa2052/routes/video.js
 let button
 let input
+// let result
 // let debug
-let torrents
-let files
+// let torrents
+// let files
 // let player
 let type
 // let magnets
 let info
 // let magnetResults
-let searchResults
+let results
+let image
 
 const init = () => {
   // debug = document.getElementById('debug')
   type = document.getElementById('type')
   button = document.getElementById('button')
   input = document.getElementById('input')
-  searchResults = document.getElementById('searchresults')
-  torrents = document.getElementById('torrents')
-  files = document.getElementById('files')
+  results = document.getElementById('results')
+  image = document.getElementById('image')
+  // torrents = document.getElementById('torrents')
+  // files = document.getElementById('files')
   // magnets = document.getElementById('queue')
   // player = document.getElementById('video')
   info = document.getElementById('info')
@@ -40,12 +43,12 @@ const init = () => {
 
   // addTorrent(test)
 }
-
+/* TODO!
 const selectTorrent = (event) => {
   // const link = event.target.getAttribute('url')
   // addTorrent(link)
   const index = event.target.getAttribute('index')
-  console.log(index)
+  // console.log(index)
   getTorrentInfo(index)
   // addTorrent(torrent)
 }
@@ -67,7 +70,7 @@ const streamTorrent = (hash, file) => {
   xhr.onreadystatechange = function () {
     if (xhr.readyState === 4) {
       if (xhr.responseText) {
-        console.log(`set : ${this.responseText}`)
+        // console.log(`set : ${this.responseText}`)
       }
     }
   }
@@ -75,7 +78,7 @@ const streamTorrent = (hash, file) => {
 }
 // TORRENT INFO
 const getTorrentInfo = (index) => {
-  console.log(index)
+  // console.log(index)
   // const encodedUri = encodeURIComponent(url)
   // console.log(encodedUri)
   const query = {
@@ -87,7 +90,7 @@ const getTorrentInfo = (index) => {
   xhr.onreadystatechange = function () {
     if (xhr.readyState === 4) {
       if (xhr.responseText) {
-        console.log(xhr.responseText)
+        // console.log(xhr.responseText)
         files.innerHTML = xhr.responseText
       }
     }
@@ -98,7 +101,7 @@ const getTorrentInfo = (index) => {
 // SELECT
 const addTorrent = (url) => {
   files.innerHTML = ''
-  console.log(url)
+  // console.log(url)
   const encodedUri = encodeURIComponent(url)
   console.log(encodedUri)
   const query = {
@@ -110,15 +113,15 @@ const addTorrent = (url) => {
   xhr.onreadystatechange = function () {
     if (xhr.readyState === 4) {
       if (xhr.responseText) {
-        console.log(xhr.responseText)
+        // console.log(xhr.responseText)
         const results = JSON.parse(xhr.responseText)
-        console.log(results)
+        // console.log(results)
         results.forEach(item => {
           const li = document.createElement('li')
           li.innerText = `${item.name}'  '${formatBytes(item.length, 0)}`
           li.setAttribute('file', item.name)
           li.setAttribute('hash', item.hash)
-          console.log(item)
+          // console.log(item)
           files.appendChild(li)
           li.addEventListener('click', showFile)
         })
@@ -128,12 +131,12 @@ const addTorrent = (url) => {
     }
   }
   xhr.send()
-}
+} */
 const search = (value) => {
   if (value) {
     button.disabled = true
     input.disabled = true
-    searchResults.innerHTML = ''
+    results.innerHTML = ''
     const query = {
       type: type.value,
       query: input.value,
@@ -149,8 +152,25 @@ const search = (value) => {
         button.disabled = false
         if (xhr.responseText) {
           const result = JSON.parse(xhr.responseText)
-          if (result.type === 'tv') {
-            result.results.forEach(episode => {
+          console.log(result)
+          image.src = result.detail.Poster
+          if (result.detail.Type === 'series') {
+            result.seasons.forEach(season => {
+              console.log(season)
+              season.episodes.forEach((episode) => {
+                const li = document.createElement('li')
+
+                const container = document.createElement('div')
+                container.classList.add('container')
+                li.appendChild(container)
+
+                const img = document.createElement('img')
+                img.src = episode.Poster
+                container.appendChild(img)
+                results.appendChild(li)
+              })
+            })
+            /* result.results.forEach(episode => {
               // const li = document.createElement('li', { is: 'search-item' }) // pwa
               const li = document.createElement('li')
               const img = document.createElement('img')
@@ -187,10 +207,10 @@ const search = (value) => {
               li.setAttribute('type', result.type)
               searchResults.appendChild(li)
               li.addEventListener('click', searchTorrent)
-            })
+            }) */
           } else {
             // movie
-            const li = document.createElement('li')
+            /* const li = document.createElement('li')
             const img = document.createElement('img')
             img.src = result.poster
 
@@ -208,7 +228,7 @@ const search = (value) => {
             li.setAttribute('query', query)
             li.setAttribute('type', result.type)
             searchResults.appendChild(li)
-            li.addEventListener('click', searchTorrent)
+            li.addEventListener('click', searchTorrent) */
           }
         }
       }
@@ -216,6 +236,8 @@ const search = (value) => {
     xhr.send()
   }
 }
+
+/*
 const searchTorrent = (event) => {
   console.log(`Search for torrent ${event.target.getAttribute('query')} ${event.target.getAttribute('type')}`)
   searchTorrents(event.target.getAttribute('query'), event.target.getAttribute('type'))
@@ -243,25 +265,25 @@ const searchTorrents = (search, type) => {
     xhr.open('GET', '/searchtorrent/' + JSON.stringify(query), true)
     xhr.setRequestHeader('Content-Type', 'application/json')
     xhr.onreadystatechange = function () {
-      console.log(xhr.readyState)
+      // console.log(xhr.readyState)
       torrents.innerHTML = ''
       if (xhr.readyState === 4) {
         input.disabled = false
         button.disabled = false
         if (xhr.responseText) {
-          console.log(xhr.responseText)
+          // console.log(xhr.responseText)
           const results = JSON.parse(xhr.responseText)
           let index = 0
           if (results && results.length > 0) {
             results.forEach(item => {
-              console.log(item)
+              // console.log(item)
               const li = document.createElement('li')
-              /* if (item.link) {
-                li.setAttribute('url', item.link)
-              }
-              if (item.site) {
-                li.setAttribute('url', item.site)
-              } */
+              // if (item.link) {
+               // li.setAttribute('url', item.link)
+              //}
+             // if (item.site) {
+             //   li.setAttribute('url', item.site)
+             // }
               li.setAttribute('index', index)
 
               // title
@@ -300,7 +322,7 @@ const searchTorrents = (search, type) => {
     }
     xhr.send()
   }
-}
+} */
 
 const clientData = () => {
   setTimeout(function () {
@@ -310,7 +332,7 @@ const clientData = () => {
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4) {
         if (xhr.responseText) {
-          console.log(this.responseText)
+          // console.log(this.responseText)
           const result = JSON.parse(xhr.responseText)
           info.innerText = `NETWORK [ external ip : ${result.network.externalip} country : ${result.network.country} internal ip ${result.network.internalip} port : ${result.network.port} ]  ACTIVITY [ download : ${result.torrents.downloadSpeed} upload : ${result.torrents.uploadSpeed} ratio :  ${result.torrents.ratio} progress ${result.torrents.progress} ]`
         }
@@ -321,6 +343,7 @@ const clientData = () => {
   }, 1000)
 }
 
+/*
 const formatBytes = (bytes, decimals) => {
   if (bytes === 0) {
     return '0 Byte'
@@ -330,6 +353,6 @@ const formatBytes = (bytes, decimals) => {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
-}
+} */
 
 document.addEventListener('DOMContentLoaded', init)

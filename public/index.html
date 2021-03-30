@@ -1,15 +1,16 @@
 <html>
 
 <head>
-  
+
   <script type="module" src='client.js'></script>
   <script type="module" src="components/SearchItem/SearchItem.js"></script>
-  
+
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      list-style: none;
     }
 
     html,
@@ -20,25 +21,25 @@
       font-size: 12px;
     }
 
-    select{
-      border:1px solid #ccc;
+    select {
+      border: 1px solid #ccc;
       border-radius: 5px;
-      padding:10px;
+      padding: 10px;
     }
 
-    input{
-      border:1px solid #ccc;
+    input {
+      border: 1px solid #ccc;
       border-radius: 5px;
-      padding:10px;
+      padding: 10px;
     }
 
-    button{
-      border:none;
-      background-color:#000;
-      color:white;
-      padding:10px;
+    button {
+      border: none;
+      background-color: #000;
+      color: white;
+      padding: 10px;
       border-radius: 5px;
-      cursor:pointer;
+      cursor: pointer;
     }
 
     #nav {
@@ -55,106 +56,91 @@
       bottom: 3rem;
     }
 
+    #main #content {
+      position: absolute;
+      width: 100%;
+      top: 0;
+      bottom: 0px;
+      background-color: red;
+      overflow: hidden;
+    }
+
+    #main #content #image {
+      width: 100%;
+      position: absolute;
+      top:0;
+      left:0;
+      height: auto;
+      display: block;
+    }
+
+    #main #results {
+      width: 100%;
+      position: absolute;
+      bottom: 0;
+      height: 220px;
+      padding:20px;
+      left: 0;
+      display: flex;
+      overflow-x: scroll;
+      background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
+      
+      /*overscroll-behavior: contain;
+      scrollbar-width: none;
+     touch-action: pan-x;
+      -ms-overflow-style: none;
+      -webkit-overflow-scrolling: touch;
+
+      scroll-snap-type: x mandatory;*/
+
+    }
+
+    /*#main #results::-webkit-scrollbar {
+      display: none;
+    }*/
+
+    #main #results li {
+      position: relative;
+      height: 100%;
+      width:300px;
+      flex-shrink: 0;
+      overflow: hidden;
+      margin-right:10px;
+      box-shadow: 0px 0px 20px rgba(0,0,0,0.8);
+    }
+    #main #results li:last-child{
+      margin-right:0px;
+    }
+    #main #results li .container{
+      position: absolute;
+      height:100%;
+      width:100%;
+    }
+
+    #main #results li  img {
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+    }
+
+
+
     #info {
       position: absolute;
       bottom: 0;
       width: 100%;
-      height:3rem;
-      background-color:#333;
-      color:white;
-      padding:0.5rem;
-    }
-
-   
-
-    #content {
-      position: absolute;
-      top: 0px;
-      bottom: 0;
-      left: 0;
-      bottom: 0px;
-      right: 0px;
-      overflow-y: auto;
-    }
-
-    .column{
-      width:33.33%;
-    }
-   .list {
-      list-style: none;
-      display: block;
-      position: absolute;
-      top: 0;
-      bottom:0;
-      overflow-y:auto;
-      background-color:#111;
-    }
-
-    #searchresults{
-      left:0;
-      
-    }
-    
-    #torrents {
-      left:33.33%;
-    }
-
-    #files {
-      right:0;
-    }
-
-    #queue {
-      left:0;
-      width:100%;
-      bottom:0;
-      top:340px;
-      color:white;
-      background-color:#222;
+      height: 3rem;
+      background-color: #000;
+      color: white;
+      padding: 0.5rem;
     }
 
     li>* {
       pointer-events: none;
     }
 
-    li> button{
+    li>button {
       pointer-events: all;
-    }
-
-    .list li{
-      width:100%;
-      cursor: pointer;
-      overflow-wrap: break-word;
-      color:#fff;
-      overflow:hidden;
-      position: relative;
-      border-bottom:1px solid rgba(255,255,255,0.5);
-     
-    }
-
-    #searchResults li .content{
-      
-      padding:0.5rem;
-    }
-
-    #searchResults li img{
-      width:6rem;
-      height:auto;
-    
-    }
-
-    .list li span{
-      font-size: 1rem;
-    }
-
-    .list li h2{
-      font-size: 1.2rem;
-    }
-
-    .file,
-    .seeders,
-    h2 {
-      width: 100%;
-      display: block;
     }
   </style>
 </head>
@@ -163,24 +149,25 @@
   <div id="nav">
     <input type="text" id="input" placeholder="search" />
     <select name="type" id="type">
-      <option value="tv">TV</option>
-      <option value="movies">Movies</option>
+      <option value="series">TV</option>
+      <option value="movie">Movies</option>
     </select>
     <button id="button">Search</button>
     <div id="menu">
       <a href="/torrents">Torrents</a>
       <a href="/player">Player</a>
     </div>
-   
+
   </div>
   <div id="main">
-  
     <div id="content">
-      <ul id='searchresults' class='list column'></ul>
-      <ul id='torrents' class='list column'></ul>
-      <ul id='files' class='list column'></ul>
-      
+      <img id="image" />
     </div>
+
+    <ul id='results'>
+    </ul>
+    <!--ul id='torrents' class='list column'></ul>
+      <ul id='files' class='list column'></ul-->
   </div>
   <div id="info"></div>
 </body>

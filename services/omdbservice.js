@@ -1,135 +1,44 @@
 // IMDB
-// const imdb = require('imdb-api')
-const http = require('http')
+const fetch = require('node-fetch')
 const omdbApiKey = process.env.OMDB_API_KEY
 const baseUrl = `http://www.omdbapi.com/?apikey=${omdbApiKey}`
-// const imdbClient = new imdb.Client({ apiKey: omdbApiKey })
 class OMDBService {
-  async episodes (imdbid, seasons, callback) {
-    const url = `${baseUrl}&t=${imdbid}&season=1`
-    http.get(url, (res) => {
-      let body = ''
-      res.on('data', (chunk) => {
-        body += chunk
-      })
-      res.on('end', () => {
-        try {
-          const json = JSON.parse(body)
-          // do something with JSON
-          console.log('episodes')
-          console.log(json)
-        } catch (error) {
-          console.error(error.message)
-        };
-      })
-    }).on('error', (error) => {
-      console.log(error)
-    })
+  async seasons (imdbid, seasons, current, callback) {
+
   }
 
-  async episode (imdbid, callback) {
-    const url = `${baseUrl}&type=episode&t=${data.query}`
-    http.get(url, (res) => {
-      let body = ''
-      res.on('data', (chunk) => {
-        body += chunk
-      })
-      res.on('end', () => {
-        try {
-          const json = JSON.parse(body)
-          // do something with JSON
-          console.log('episodes')
-          console.log(json)
-        } catch (error) {
-          console.error(error.message)
-        };
-      })
-    }).on('error', (error) => {
-      console.log(error)
-    })
-  }
-
-  async search (json, callback) {
+  async search (json) {
     const data = JSON.parse(json)
-    const result = {
-      status: 200,
-      message: '',
-      title: '',
-      poster: '',
-      results: [],
-      type: '',
-      year: ''
+    console.log(data)
+    const info = {
+      detail: {},
+      seasons: []
     }
-
-    const type = 'series'
-    const url = `${baseUrl}&type=${type}&t=${data.query}`
-    console.log(url)
-
-    http.get(url, (res) => {
-      let body = ''
-      res.on('data', (chunk) => {
-        body += chunk
-      })
-      res.on('end', () => {
-        try {
-          const json = JSON.parse(body)
-          // do something with JSON
-          console.log('search')
-          console.log(json)
-          result.poster = json.Poster
-          result.title = json.Title
-          result.year = json.Year
-          result.status = 200
-          switch (type) {
-            case 'series':
-              this.episodes(json.imdbID, json.totalSeasons)
-              break
-            case 'movies':
-              break
-          }
-        } catch (error) {
-          console.error(error.message)
-        };
-      })
-    }).on('error', (error) => {
-      result.status = 500
-      result.message = error
-    })
-
-    /*
-
-    await imdbClient.get({ name: data.query }).then((search) => {
-      result.poster = search.poster
-      result.title = search.name
-      result.year = search.year
-      result.status = 200
-      switch (search.constructor.name) {
-        case 'Movie':
-          result.type = 'movie'
-          break
-        case 'TVShow':
-          result.type = 'tv'
-          return search.episodes()
+    try {
+      const result = await fetch(`${baseUrl}&type=${data.type}&t=${data.query}`).then(response => response.json())
+      if (result.Poster) {
+        result.Poster = result.Poster.replace('300.jpg', '1920.jpg')
       }
-    }).then((eps) => {
-      if (eps) {
-        const episodes = []
-        eps.forEach((item) => {
-          console.log(item)
-          if (item.poster === undefined) {
-            item.poster = result.poster
+      info.detail = result
+      if (result.Type === 'series') {
+        for (let i = 0; i < result.totalSeasons; i++) {
+          const season = await fetch(`${baseUrl}&t=${result.imdbID}&season=${i + 1}`).then(response => response.json())
+          const seasonData = {
+            episodes: []
           }
-          episodes.push(item)
-        })
-        result.results = episodes
+          info.seasons.push(seasonData)
+          for (let e = 0; e < season.Episodes.length; e++) {
+            const episode = season.Episodes[e]
+            const detail = await fetch(`${baseUrl}&type=episode&i=${episode.imdbID}`).then(response => response.json())
+            seasonData.episodes.push(detail)
+          }
+        }
       }
-      // res.send(JSON.stringify(result))
-    }).catch((error) => {
-      result.status = 500
-      result.message = error
-    }).finally(() => {
-      callback(result)
-    }) */
+      return info
+    } catch (e) {
+
+    }
   }
 }
+
 module.exports = OMDBService
