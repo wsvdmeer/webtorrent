@@ -4,6 +4,7 @@ dotenv.config()
 
 // services
 const OMDBService = require('./services/omdbservice')
+const TMDBService = require('./services/tmdbservice')
 // const SearchService = require('./services/searchservice')
 const IndexerService = require('./services/indexerservice')
 const TorrentService = require('./services/torrentservice')
@@ -17,6 +18,7 @@ const router = express.Router()
 const port = process.env.PORT // || 4000
 
 const omdbService = new OMDBService()
+const tmdbService = new TMDBService()
 // const searchService = new SearchService()
 const indexerService = new IndexerService()
 const torrentService = new TorrentService(indexerService)
@@ -54,8 +56,10 @@ router.get('/torrents', function (req, res) {
 // ACTIONS
 // Imdb search
 app.get('/search/:search', async function async (req, res, next) {
-  const result = await omdbService.search(req.params.search)
-  console.log(result)
+  const result = await tmdbService.search(req.params.search)
+  // console.log(result)
+  // const result = await omdbService.search(req.params.search)
+  // console.log(result)
   res.send(JSON.stringify(result))
 })
 // Torrent search

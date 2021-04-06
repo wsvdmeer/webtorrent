@@ -1,17 +1,15 @@
+// create template
 const template = document.createElement('template')
 template.innerHTML = `
-<div>
-    <!--Headline-->
-    <p>Rating</p>
-    <!--rating-stars-->
-    <div class="rating-stars">
-        <div class="rating-star star-1"></div>
-        <div class="rating-star star-2"></div>
-        <div class="rating-star star-3"></div>
-        <div class="rating-star star-4"></div>
-        <div class="rating-star star-5"></div>
-    </div>
-</div>
+<style>
+  div {
+    margin-top: 20px;
+    color: green;
+  }
+  </style>
+  <div>
+  <p>The Google search result of your name is <a target="_blank" rel="noopener">here</a></p>
+  </div>
 `
 
 class SearchItem extends HTMLLIElement {

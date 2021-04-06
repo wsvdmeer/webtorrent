@@ -9,7 +9,6 @@ class OMDBService {
 
   async search (json) {
     const data = JSON.parse(json)
-    console.log(data)
     const info = {
       detail: {},
       seasons: []

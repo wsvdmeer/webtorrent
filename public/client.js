@@ -30,17 +30,46 @@ const init = () => {
   // events
   input.addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
-      search(input.value)
+      search(input.value, type.value)
     }
   })
 
   button.addEventListener('click', () => {
-    search(input.value)
+    search(input.value, type.value)
+  })
+
+  results.addEventListener('wheel', (e) => {
+    e.preventDefault()
+    const step = 320
+
+    let nextPos
+    // let containerScrollPosition = results.getBoundingClientRect().x -= (e.deltaY / 300)
+    if (e.deltaY > 0) {
+      // down
+      nextPos = results.getBoundingClientRect().x += step
+    } else {
+      nextPos = results.getBoundingClientRect().x -= step
+    }
+    console.log(nextPos)
+
+    if (nextPos > 0) {
+      nextPos = 0
+    }
+
+    const max = window.innerWidth - results.getBoundingClientRect().width
+
+    if (nextPos <= max) {
+      nextPos = max
+    }
+
+    console.log(nextPos)
+    results.style.left = nextPos + 'px'
   })
 
   // listFiles()
   clientData()
-
+  input.value = 'Wandavision'
+  search(input.value, type.value)
   // addTorrent(test)
 }
 /* TODO!
@@ -132,14 +161,14 @@ const addTorrent = (url) => {
   }
   xhr.send()
 } */
-const search = (value) => {
+const search = (value, type) => {
   if (value) {
     button.disabled = true
     input.disabled = true
     results.innerHTML = ''
     const query = {
-      type: type.value,
-      query: input.value,
+      type: type,
+      query: value,
       page: 1
     }
     console.log('Search imdb' + input.value)
@@ -153,11 +182,12 @@ const search = (value) => {
         if (xhr.responseText) {
           const result = JSON.parse(xhr.responseText)
           console.log(result)
-          image.src = result.detail.Poster
-          if (result.detail.Type === 'series') {
+          image.src = `https://image.tmdb.org/t/p/original${result.detail.backdrop_path}`
+          if (result.type === 'tv') {
             result.seasons.forEach(season => {
               console.log(season)
               season.episodes.forEach((episode) => {
+                console.log(episode)
                 const li = document.createElement('li')
 
                 const container = document.createElement('div')
@@ -165,8 +195,21 @@ const search = (value) => {
                 li.appendChild(container)
 
                 const img = document.createElement('img')
-                img.src = episode.Poster
+                img.src = `https://image.tmdb.org/t/p/w500${episode.still_path}`
                 container.appendChild(img)
+
+                const info = document.createElement('div')
+                info.classList.add('info')
+                container.appendChild(info)
+
+                const number = document.createElement('span')
+                number.innerText = `${season.season_number}-${episode.episode_number}`
+                info.appendChild(number)
+
+                const title = document.createElement('h2')
+                title.innerText = episode.name
+                info.appendChild(title)
+
                 results.appendChild(li)
               })
             })
