@@ -9,7 +9,7 @@
   "author": "wsvdmeer",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "^8.2.0",
+    "dotenv": "^8.6.0",
     "express": "^4.17.1",
     "imdb-api": "^4.4.1",
     "node-fetch": "^2.6.1",
@@ -18,9 +18,9 @@
     "webtorrent": "^0.110.1"
   },
   "devDependencies": {
-    "eslint": "^7.22.0",
-    "eslint-config-standard": "^16.0.2",
-    "eslint-plugin-import": "^2.22.1",
+    "eslint": "^7.27.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.23.3",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.3.1",
     "nodemon": "^2.0.7"
