@@ -46,9 +46,9 @@ const init = () => {
     // let containerScrollPosition = results.getBoundingClientRect().x -= (e.deltaY / 300)
     if (e.deltaY > 0) {
       // down
-      nextPos = results.getBoundingClientRect().x += step
-    } else {
       nextPos = results.getBoundingClientRect().x -= step
+    } else {
+      nextPos = results.getBoundingClientRect().x += step
     }
     console.log(nextPos)
 
@@ -68,7 +68,7 @@ const init = () => {
 
   // listFiles()
   clientData()
-  input.value = 'Wandavision'
+  input.value = 'American Gods'
   search(input.value, type.value)
   // addTorrent(test)
 }

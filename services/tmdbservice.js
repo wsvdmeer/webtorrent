@@ -11,24 +11,20 @@ class TMDBService {
       seasons: []
     }
     try {
-      let type = 'movie'
-      if (data.type === 'series') {
-        type = 'tv'
-      }
-      const result = await fetch(`${baseUrl}/search/${type}?api_key=${tmdbApiKey}&query=${data.query}&page=1`).then(response => response.json())
-      console.log('result' + result.results[0].id)
-      const details = await fetch(`${baseUrl}/${type}/${result.results[0].id}?api_key=${tmdbApiKey}`).then(response => response.json())
-      console.log('details' + details.name)
-      info.type = type
+      const result = await fetch(`${baseUrl}/search/${data.type}?api_key=${tmdbApiKey}&query=${data.query}&page=1`).then(response => response.json())
+      console.log(`result : ${result.results[0].id}`)
+      const details = await fetch(`${baseUrl}/${data.type}/${result.results[0].id}?api_key=${tmdbApiKey}`).then(response => response.json())
+      console.log(details)
+      info.type = data.type
       info.detail = details
-      if (type === 'tv') {
+      /* if (data.type === 'tv') {
+        console.log('before return : ' + info.seasons.length)
         for (let s = 0; s < details.seasons.length; s++) {
-          const season = await fetch(`${baseUrl}/${type}/${details.id}/season/${s + 1}?api_key=${tmdbApiKey}`).then(response => response.json())
+          const season = await fetch(`${baseUrl}/${data.type}/${details.id}/season/${s + 1}?api_key=${tmdbApiKey}`).then(response => response.json())
           info.seasons.push(season)
         }
-        return info
-      }
-      console.log('befor return : ' + info.seasons.length)
+      } */
+      return info
     } catch (e) {
 
     }

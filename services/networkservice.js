@@ -2,7 +2,6 @@ const os = require('os')
 const https = require('https')
 class NetworkService {
   getNetworkInfo (callback) {
-    // const options = new URL('https://ifconfig.me/all.json')
     const options = new URL('https://www.trackip.net/ip?json')
     const ip4 = Object.values(os.networkInterfaces()).flat().find(i => i.family === 'IPv4' && !i.internal).address
     const networkInfo = { externalip: '', country: '', internalip: ip4 }
