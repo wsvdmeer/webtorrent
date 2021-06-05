@@ -35,10 +35,9 @@ const torrents = []
 app.use(express.static('public'))
 app.use(express.json())
 app.use('/public', express.static(path.resolve(__dirname, 'public', 'static')))
-app.use('/fonts', express.static(path.resolve(__dirname, 'public/fonts', 'static')))
 
 router.get('/', function (_req, res) {
-  res.sendFile(path.join(__dirname, 'public/views/dashboard/index.html'))
+  res.sendFile(path.join(__dirname, 'public/views/search/index.html'))
 })
 
 // Player route
