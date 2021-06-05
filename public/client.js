@@ -68,7 +68,7 @@ const init = () => {
 
   // listFiles()
   clientData()
-  input.value = 'American Gods'
+  input.value = 'Evil Dead'
   search(input.value, type.value)
   // addTorrent(test)
 }
@@ -161,17 +161,31 @@ const addTorrent = (url) => {
   }
   xhr.send()
 } */
-const search = (value, type) => {
+const search = async (value, type) => {
   if (value) {
-    button.disabled = true
-    input.disabled = true
+    // button.disabled = true
+    // input.disabled = true
     results.innerHTML = ''
     const query = {
       type: type,
       query: value,
       page: 1
     }
-    console.log('Search imdb' + input.value)
+    console.log('Search tmdb' + input.value)
+
+    await fetch('/search/' + JSON.stringify(query))
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data)
+        data.results.forEach((item) => {
+          const li = document.createElement('li')
+          li.innerText = item.title
+          console.log(item)
+          results.appendChild(li)
+        })
+      })
+
+    /*
     const xhr = new XMLHttpRequest()
     xhr.open('GET', '/search/' + JSON.stringify(query), true)
     xhr.setRequestHeader('Content-Type', 'application/json')
@@ -180,6 +194,7 @@ const search = (value, type) => {
         input.disabled = false
         button.disabled = false
         if (xhr.responseText) {
+          console.log(xhr.responseText)
           const result = JSON.parse(xhr.responseText)
           console.log(result)
           image.src = `https://image.tmdb.org/t/p/original${result.detail.backdrop_path}`
@@ -213,7 +228,7 @@ const search = (value, type) => {
                 results.appendChild(li)
               })
             })
-            /* result.results.forEach(episode => {
+             result.results.forEach(episode => {
               // const li = document.createElement('li', { is: 'search-item' }) // pwa
               const li = document.createElement('li')
               const img = document.createElement('img')
@@ -250,10 +265,10 @@ const search = (value, type) => {
               li.setAttribute('type', result.type)
               searchResults.appendChild(li)
               li.addEventListener('click', searchTorrent)
-            }) */
+            })
           } else {
             // movie
-            /* const li = document.createElement('li')
+             const li = document.createElement('li')
             const img = document.createElement('img')
             img.src = result.poster
 
@@ -271,12 +286,12 @@ const search = (value, type) => {
             li.setAttribute('query', query)
             li.setAttribute('type', result.type)
             searchResults.appendChild(li)
-            li.addEventListener('click', searchTorrent) */
+            li.addEventListener('click', searchTorrent)
           }
         }
       }
     }
-    xhr.send()
+    xhr.send() */
   }
 }
 
@@ -375,7 +390,7 @@ const clientData = () => {
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4) {
         if (xhr.responseText) {
-          // console.log(this.responseText)
+          console.log(this.responseText)
           const result = JSON.parse(xhr.responseText)
           info.innerText = `NETWORK [ external ip : ${result.network.externalip} country : ${result.network.country} internal ip ${result.network.internalip} port : ${result.network.port} ]  ACTIVITY [ download : ${result.torrents.downloadSpeed} upload : ${result.torrents.uploadSpeed} ratio :  ${result.torrents.ratio} progress ${result.torrents.progress} ]`
         }

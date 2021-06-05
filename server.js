@@ -35,9 +35,6 @@ let torrents = []
 app.use(express.static('public'))
 app.use(express.json())
 app.use('/public', express.static(path.resolve(__dirname, 'public', 'static')))
-app.get('/*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'public', 'index.html'))
-})
 
 router.get('/', function (_req, res) {
   res.sendFile(path.join(__dirname, 'public/index.html'))
@@ -56,7 +53,8 @@ router.get('/torrents', function (_req, res) {
 // TMDB
 // Imdb search
 app.get('/search/:search', async function async (req, res, next) {
-  const result = await tmdbService.search(req.params.search)
+  const data = JSON.parse(req.params.search)
+  const result = await tmdbService.search('multi', data.query)
   // console.log(result)
   // const result = await omdbService.search(req.params.search)
   // console.log(result)
