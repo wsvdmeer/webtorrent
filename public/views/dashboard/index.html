@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="/style/app.css">
+  <link rel="stylesheet" href="/views/dashboard/style.css">
+  <script type="module" src='/views/dashboard/index.js'></script>
+</head>
+
+<body>
+  <div id="nav">
+    <input type="text" id="input" placeholder="search" />
+    <select name="type" id="type">
+      <option value='multi'>All</option>
+      <option value="tv">TV</option>
+      <option value="movie">Movies</option>
+    </select>
+    <button id="button">Search</button>
+  </div>
+  <div id="main">
+    <ul id='results'>
+    </ul>
+  </div>
+  <div id="info"></div>
+</body>
+
+</html>
