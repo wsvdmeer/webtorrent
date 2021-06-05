@@ -38,38 +38,8 @@ const init = () => {
     search(input.value, type.value)
   })
 
-  /*
-  results.addEventListener('wheel', (e) => {
-    e.preventDefault()
-    const step = 320
-
-    let nextPos
-    // let containerScrollPosition = results.getBoundingClientRect().x -= (e.deltaY / 300)
-    if (e.deltaY > 0) {
-      // down
-      nextPos = results.getBoundingClientRect().x -= step
-    } else {
-      nextPos = results.getBoundingClientRect().x += step
-    }
-    console.log(nextPos)
-
-    if (nextPos > 0) {
-      nextPos = 0
-    }
-
-    const max = window.innerWidth - results.getBoundingClientRect().width
-
-    if (nextPos <= max) {
-      nextPos = max
-    }
-
-    console.log(nextPos)
-    results.style.left = nextPos + 'px'
-  }) */
-
-  // listFiles()
-  clientData()
-  input.value = 'Evil Dead'
+  getInfo()
+  input.value = 'Mortal Kombat'
   search(input.value, type.value)
   // addTorrent(test)
 }
@@ -193,6 +163,7 @@ const search = async (value, type) => {
             const name = getTitle(item)
             const li = document.createElement('li')
             const link = document.createElement('a')
+            // todo got to /detail
             link.setAttribute('href', `/searchtorrent/?type=${item.media_type}&query=${name}`)
             link.setAttribute('target', '_self')
             li.appendChild(link)
@@ -208,122 +179,10 @@ const search = async (value, type) => {
           })
         }
       })
-
-    /*
-    const xhr = new XMLHttpRequest()
-    xhr.open('GET', '/search/' + JSON.stringify(query), true)
-    xhr.setRequestHeader('Content-Type', 'application/json')
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState === 4) {
-        input.disabled = false
-        button.disabled = false
-        if (xhr.responseText) {
-          console.log(xhr.responseText)
-          const result = JSON.parse(xhr.responseText)
-          console.log(result)
-          image.src = `https://image.tmdb.org/t/p/original${result.detail.backdrop_path}`
-          if (result.type === 'tv') {
-            result.seasons.forEach(season => {
-              console.log(season)
-              season.episodes.forEach((episode) => {
-                console.log(episode)
-                const li = document.createElement('li')
-
-                const container = document.createElement('div')
-                container.classList.add('container')
-                li.appendChild(container)
-
-                const img = document.createElement('img')
-                img.src = `https://image.tmdb.org/t/p/w500${episode.still_path}`
-                container.appendChild(img)
-
-                const info = document.createElement('div')
-                info.classList.add('info')
-                container.appendChild(info)
-
-                const number = document.createElement('span')
-                number.innerText = `${season.season_number}-${episode.episode_number}`
-                info.appendChild(number)
-
-                const title = document.createElement('h2')
-                title.innerText = episode.name
-                info.appendChild(title)
-
-                results.appendChild(li)
-              })
-            })
-             result.results.forEach(episode => {
-              // const li = document.createElement('li', { is: 'search-item' }) // pwa
-              const li = document.createElement('li')
-              const img = document.createElement('img')
-              img.src = episode.poster
-
-              const content = document.createElement('div')
-              content.classList.add('content')
-              const title = document.createElement('h2')
-              title.innerText = episode.title
-
-              const info = document.createElement('span')
-
-              li.appendChild(img)
-              li.appendChild(content)
-              content.appendChild(title)
-              content.appendChild(info)
-
-              // create query
-              let s = `s${episode.season.toString()}`
-              if (episode.season < 10) {
-                s = `s0${episode.season}`
-              }
-
-              let e = `e${episode.episode.toString()}`
-              if (episode.episode < 10) {
-                e = `e0${episode.episode}`
-              }
-
-              info.innerText = `Season ${s} Episode ${e}`
-
-              const query = `${result.title} ${s}${e}`
-
-              li.setAttribute('query', query)
-              li.setAttribute('type', result.type)
-              searchResults.appendChild(li)
-              li.addEventListener('click', searchTorrent)
-            })
-          } else {
-            // movie
-             const li = document.createElement('li')
-            const img = document.createElement('img')
-            img.src = result.poster
-
-            const title = document.createElement('h2')
-            title.innerText = result.title
-
-            const info = document.createElement('span')
-            info.innerText = result.year
-
-            li.appendChild(img)
-            li.appendChild(title)
-            li.appendChild(info)
-
-            const query = `${result.title} ${result.year}`
-            li.setAttribute('query', query)
-            li.setAttribute('type', result.type)
-            searchResults.appendChild(li)
-            li.addEventListener('click', searchTorrent)
-          }
-        }
-      }
-    }
-    xhr.send() */
   }
 }
 
 /*
-const searchTorrent = (event) => {
-  console.log(`Search for torrent ${event.target.getAttribute('query')} ${event.target.getAttribute('type')}`)
-  searchTorrents(event.target.getAttribute('query'), event.target.getAttribute('type'))
-}
 // SEARCH TORRENT
 const searchTorrents = (search, type) => {
   if (search) {
@@ -406,22 +265,16 @@ const searchTorrents = (search, type) => {
   }
 } */
 
-const clientData = () => {
-  setTimeout(function () {
-    const xhr = new XMLHttpRequest()
-    xhr.open('GET', '/info/', true)
-    xhr.setRequestHeader('Content-Type', 'application/json')
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState === 4) {
-        if (xhr.responseText) {
-          console.log(this.responseText)
-          const result = JSON.parse(xhr.responseText)
+const getInfo = () => {
+  setTimeout(async () => {
+    await fetch('/info/')
+      .then((response) => response.json())
+      .then((result) => {
+        if (result) {
           info.innerText = `NETWORK [ external ip : ${result.network.externalip} country : ${result.network.country} internal ip ${result.network.internalip} port : ${result.network.port} ]  ACTIVITY [ download : ${result.torrents.downloadSpeed} upload : ${result.torrents.uploadSpeed} ratio :  ${result.torrents.ratio} progress ${result.torrents.progress} ]`
         }
-        clientData()
-      }
-    }
-    xhr.send()
+      })
+    getInfo()
   }, 1000)
 }
 
