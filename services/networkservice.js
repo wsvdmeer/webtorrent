@@ -4,7 +4,7 @@ class NetworkService {
   getNetworkInfo (callback) {
     const options = new URL('https://www.trackip.net/ip?json')
     const ip4 = Object.values(os.networkInterfaces()).flat().find(i => i.family === 'IPv4' && !i.internal).address
-    const networkInfo = { externalip: '', country: '', internalip: ip4 }
+    const networkInfo = { externalip: '', country: '', internalip: ip4, port: process.env.PORT }
     const externalIPRequest = https.request(options, res => {
       let data = ''
       res.on('data', (chunk) => {

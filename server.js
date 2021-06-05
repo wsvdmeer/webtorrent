@@ -29,36 +29,38 @@ let currentStream = {
   filename: ''
 }
 
-let torrents = []
+const torrents = []
 
 // ROUTES
 app.use(express.static('public'))
 app.use(express.json())
 app.use('/public', express.static(path.resolve(__dirname, 'public', 'static')))
+app.use('/fonts', express.static(path.resolve(__dirname, 'public/fonts', 'static')))
 
 router.get('/', function (_req, res) {
-  res.sendFile(path.join(__dirname, 'public/index.html'))
+  res.sendFile(path.join(__dirname, 'public/views/dashboard/index.html'))
 })
 
 // Player route
 router.get('/player', function (_req, res) {
-  res.sendFile(path.join(__dirname, 'public/player.html'))
+  res.sendFile(path.join(__dirname, 'public/views/player/index.html'))
 })
 
 // Torrents route
 router.get('/torrents', function (_req, res) {
-  res.sendFile(path.join(__dirname, 'public/torrents.html'))
+  res.sendFile(path.join(__dirname, 'public/views/torrents/index.html'))
 })
 
+router.get('/searchtorrent*', function (req, res) {
+  console.log('search torrents')
+  res.sendFile(path.join(__dirname, 'public/views/searchtorrent/index.html'))
+})
 // TMDB
 // Imdb search
 app.get('/search/:search', async function async (req, res, next) {
   const data = JSON.parse(req.params.search)
-  const result = await tmdbService.search('multi', data.query)
-  // console.log(result)
-  // const result = await omdbService.search(req.params.search)
-  // console.log(result)
-  res.send(JSON.stringify(result))
+  const result = await tmdbService.search(data.type, data.query)
+  res.send(JSON.stringify(result.results))
 })
 
 // STREAM
@@ -131,9 +133,9 @@ app.get('/currentstream', function (req, res, next) {
 
 // TORRENT INDEXER
 // Search
-app.get('/searchtorrent/:search', async function (req, res) {
+
+app.get('/searchindexers/:search', async function (req, res) {
   const results = await indexerService.search(req.params.search)
-  torrents = results
   console.log('TorrentIndexer')
   console.log(results)
   if (results.length > 0) {

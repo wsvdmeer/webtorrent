@@ -12,7 +12,7 @@ let type
 let info
 // let magnetResults
 let results
-let image
+// let image
 
 const init = () => {
   // debug = document.getElementById('debug')
@@ -20,7 +20,7 @@ const init = () => {
   button = document.getElementById('button')
   input = document.getElementById('input')
   results = document.getElementById('results')
-  image = document.getElementById('image')
+  // image = document.getElementById('image')
   // torrents = document.getElementById('torrents')
   // files = document.getElementById('files')
   // magnets = document.getElementById('queue')
@@ -38,6 +38,7 @@ const init = () => {
     search(input.value, type.value)
   })
 
+  /*
   results.addEventListener('wheel', (e) => {
     e.preventDefault()
     const step = 320
@@ -64,7 +65,7 @@ const init = () => {
 
     console.log(nextPos)
     results.style.left = nextPos + 'px'
-  })
+  }) */
 
   // listFiles()
   clientData()
@@ -161,28 +162,51 @@ const addTorrent = (url) => {
   }
   xhr.send()
 } */
+
+const getTitle = (item) => {
+  if (item.media_type === 'tv') {
+    return item.name
+  }
+  return item.title
+}
+
+const getImage = (item) => {
+  if (item.poster_path) {
+    return `https://image.tmdb.org/t/p/w500${item.poster_path}`
+  }
+  return ''
+}
+
 const search = async (value, type) => {
   if (value) {
-    // button.disabled = true
-    // input.disabled = true
     results.innerHTML = ''
-    const query = {
+    await fetch('/search/' + JSON.stringify({
       type: type,
       query: value,
       page: 1
-    }
-    console.log('Search tmdb' + input.value)
-
-    await fetch('/search/' + JSON.stringify(query))
+    }))
       .then((response) => response.json())
       .then((data) => {
-        console.log(data)
-        data.results.forEach((item) => {
-          const li = document.createElement('li')
-          li.innerText = item.title
-          console.log(item)
-          results.appendChild(li)
-        })
+        if (data && data.length > 0) {
+          data.forEach((item) => {
+            console.log(item)
+            const name = getTitle(item)
+            const li = document.createElement('li')
+            const link = document.createElement('a')
+            link.setAttribute('href', `/searchtorrent/?type=${item.media_type}&query=${name}`)
+            link.setAttribute('target', '_self')
+            li.appendChild(link)
+
+            const title = document.createElement('div')
+            title.innerText = name
+            const img = document.createElement('img')
+
+            img.setAttribute('src', getImage(item))
+            link.appendChild(img)
+            link.appendChild(title)
+            results.appendChild(li)
+          })
+        }
       })
 
     /*
