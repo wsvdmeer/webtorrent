@@ -76,27 +76,6 @@ const streamTorrent = (hash, file) => {
   }
   xhr.send()
 }
-// TORRENT INFO
-const getTorrentInfo = (index) => {
-  // console.log(index)
-  // const encodedUri = encodeURIComponent(url)
-  // console.log(encodedUri)
-  const query = {
-    index: index
-  }
-  const xhr = new XMLHttpRequest()
-  xhr.open('GET', '/gettorrentinfo/' + JSON.stringify(query), true)
-  xhr.setRequestHeader('Content-Type', 'application/json')
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4) {
-      if (xhr.responseText) {
-        // console.log(xhr.responseText)
-        files.innerHTML = xhr.responseText
-      }
-    }
-  }
-  xhr.send()
-}
 
 // SELECT
 const addTorrent = (url) => {
@@ -164,7 +143,7 @@ const search = async (value, type) => {
             const li = document.createElement('li')
             const link = document.createElement('a')
             // todo got to /detail
-            link.setAttribute('href', `/searchtorrent/?type=${item.media_type}&query=${name}`)
+            link.setAttribute('href', `/detail?type=${item.media_type}&query=${name}`)
             link.setAttribute('target', '_self')
             li.appendChild(link)
 
@@ -267,7 +246,7 @@ const searchTorrents = (search, type) => {
 
 const getInfo = () => {
   setTimeout(async () => {
-    await fetch('/info/')
+    await fetch('/api/info/')
       .then((response) => response.json())
       .then((result) => {
         if (result) {
