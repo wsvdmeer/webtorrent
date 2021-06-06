@@ -50,21 +50,34 @@ router.get('/torrents', function (_req, res) {
   res.sendFile(path.join(__dirname, 'public/views/torrents/index.html'))
 })
 
-router.get('/searchtorrent*', function (req, res) {
+// Search torrents routes
+router.get('/searchtorrent*', function (_req, res) {
   console.log('search torrents')
   res.sendFile(path.join(__dirname, 'public/views/searchtorrent/index.html'))
 })
+
+// Detail route
+router.get('/detail*', function (_req, res) {
+  res.sendFile(path.join(__dirname, 'public/views/detail/index.html'))
+})
+
 // TMDB
-// Imdb search
-app.get('/search/:search', async function async (req, res, next) {
+app.get('/api/search/:search', async function async (req, res, next) {
   const data = JSON.parse(req.params.search)
   const result = await tmdbService.search(data.type, data.query)
   res.send(JSON.stringify(result.results))
 })
 
+app.get('/api/detail/:query', async function async (req, res, next) {
+  console.log('api detail')
+  const data = JSON.parse(req.params.query)
+  const result = await tmdbService.getDetail(data.type, data.id)
+  res.send(JSON.stringify(result))
+})
+
 // STREAM
 // Set current stream
-app.get('/setstream/:magnet/:filename', async function (req, res, next) {
+app.get('/api/setstream/:magnet/:filename', async function (req, res, next) {
   const magnet = req.params.magnet // data.hash
   const filename = req.params.filename // data.file
   currentStream = {
@@ -75,7 +88,7 @@ app.get('/setstream/:magnet/:filename', async function (req, res, next) {
 })
 
 // Start stream
-app.get('/stream/:magnet/:filename', async function (req, res, next) {
+app.get('/api/stream/:magnet/:filename', async function (req, res, next) {
   const magnet = req.params.magnet // data.hash
   const filename = req.params.filename // data.file
   const torrent = torrentService.getTorrent(magnet)// client.get(magnet)
@@ -121,7 +134,7 @@ app.get('/stream/:magnet/:filename', async function (req, res, next) {
 })
 
 // Get current stream
-app.get('/currentstream', function (req, res, next) {
+app.get('/api/currentstream', function (req, res, next) {
   if (currentStream) {
     if (currentStream.hash && currentStream.filename) {
       res.status(200)
@@ -133,7 +146,7 @@ app.get('/currentstream', function (req, res, next) {
 // TORRENT INDEXER
 // Search
 
-app.get('/searchindexers/:search', async function (req, res) {
+app.get('/api/searchindexers/:search', async function (req, res) {
   const results = await indexerService.search(req.params.search)
   console.log('TorrentIndexer')
   console.log(results)
@@ -144,7 +157,7 @@ app.get('/searchindexers/:search', async function (req, res) {
 })
 
 // Torrent info
-app.get('/gettorrentinfo/:torrent', async function (req, res) {
+app.get('/api/gettorrentinfo/:torrent', async function (req, res) {
   const data = JSON.parse(req.params.torrent)
   const index = data.index
   console.log(index)
@@ -155,7 +168,7 @@ app.get('/gettorrentinfo/:torrent', async function (req, res) {
 
 // TORRENTCLIENT
 // Info
-app.get('/info', async function (req, res, next) {
+app.get('/api/info', async function (req, res, next) {
   const torrentInfo = torrentService.getTorrentsInfo()
   const data = {
     network: networkInfo,
@@ -166,7 +179,7 @@ app.get('/info', async function (req, res, next) {
 })
 
 // Add torrent
-app.get('/add/:torrent', async function (req, res) {
+app.get('/api/add/:torrent', async function (req, res) {
   await torrentService.addTorrent(req.params.torrent, (result) => {
     res.status(result.status)
     res.json(result.json)
@@ -174,7 +187,7 @@ app.get('/add/:torrent', async function (req, res) {
 })
 
 // Remove torrent
-app.get('/remove/:torrent', async function (req, res) {
+app.get('/api/remove/:torrent', async function (req, res) {
   console.log(`remove : ${req.params.torrents}`)
   const result = await torrentService.removeTorrent(req.params.torrent)
   res.status(200)
@@ -182,7 +195,7 @@ app.get('/remove/:torrent', async function (req, res) {
 })
 
 // List torrents
-app.get('/list', function (req, res, next) {
+app.get('/api/list', function (req, res, next) {
   const torrents = torrentService.getTorrents()
   res.status(200)
   res.json(torrents)
