@@ -1,7 +1,20 @@
+
 let magnetResults
-let magnets
-const removeTorrent = (event) => {
-  const url = event.target.getAttribute('url')
+const queue = document.getElementById('queue')
+const removeTorrent = async (magnet) => {
+  await fetch('/api/remove/', {
+    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ magnet: magnet })
+  }).then((response) => response.json())
+    .then((data) => {
+      console.log(data)
+      // this.window.location = '/torrents'
+    })
+
+  /* const url = event.target.getAttribute('url')
   const encodedUri = encodeURIComponent(url)
   const query = {
     url: encodedUri
@@ -16,14 +29,15 @@ const removeTorrent = (event) => {
       }
     }
   }
-  xhr.send()
+  xhr.send() */
 }
 
 const init = () => {
-  magnets = document.getElementById('queue')
+  scanDirectory()
   listFiles()
 }
 
+/*
 const selectTorrent = (event) => {
   const url = event.target.getAttribute('url')
   console.log(url)
@@ -64,67 +78,63 @@ const streamTorrent = (hash, file) => {
     }
   }
   xhr.send()
+} */
+
+const scanDirectory = async () => {
+  await fetch('/api/scan/')
 }
 
 const listFiles = () => {
-  setTimeout(function () {
-    const xhr = new XMLHttpRequest()
-    xhr.open('GET', '/list/', true)
-    xhr.setRequestHeader('Content-Type', 'application/json')
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState === 4) {
-        if (xhr.responseText) {
-          const results = JSON.parse(xhr.responseText)
-          if (results.length > 0) {
-            if (JSON.stringify(results) !== JSON.stringify(magnetResults)) {
-              magnetResults = results
-              // console.log('different')
-              // console.log(results)
-              magnets.innerHTML = ''
-              magnetResults.forEach(item => {
-                const li = document.createElement('li')
+  setTimeout(async () => {
+    await fetch('/api/list/')
+      .then((response) => response.json())
+      .then((results) => {
+        console.log(results)
+        if (results.length > 0) {
+          if (JSON.stringify(results) !== JSON.stringify(magnetResults)) {
+            magnetResults = results
+            queue.innerHTML = ''
+            magnetResults.forEach(item => {
+              const li = document.createElement('li')
+              const title = document.createElement('h2')
+              title.innerText = item.name
+              li.appendChild(title)
 
-                const title = document.createElement('h2')
-                title.innerText = item.name
-                li.appendChild(title)
+              const infoList = document.createElement('div')
+              li.appendChild(infoList)
 
-                const infoList = document.createElement('div')
-                li.appendChild(infoList)
+              const remove = document.createElement('button')
+              remove.innerText = 'Remove'
+              li.appendChild(remove)
+              // remove.setAttribute('magnet', item.magnetUri)
+              // remove.setAttribute('path', item.path)
+              remove.addEventListener('click', () => { removeTorrent(item.magnetUri) })
 
-                const remove = document.createElement('button')
-                remove.innerText = 'Remove'
-                li.appendChild(remove)
-                remove.setAttribute('url', item.magnetUri)
-                remove.setAttribute('path', item.path)
-                remove.addEventListener('click', removeTorrent)
+              /*
+              const play = document.createElement('button')
+              play.innerText = 'Play'
+              li.appendChild(play)
+              play.setAttribute('url', item.magnetUri)
+              play.addEventListener('click', selectTorrent) */
 
-                const play = document.createElement('button')
-                play.innerText = 'Play'
-                li.appendChild(play)
-                play.setAttribute('url', item.magnetUri)
-                play.addEventListener('click', selectTorrent)
+              let infoText = ''
 
-                let infoText = ''
+              for (const [key, value] of Object.entries(item)) {
+                infoText += `${key} : ${value}\n`
+              }
+              infoList.innerText = infoText
 
-                for (const [key, value] of Object.entries(item)) {
-                  infoText += `${key} : ${value}\n`
-                }
-                infoList.innerText = infoText
-
-                // li.innerText = item.name + '/' + item.infoHash + '/' + item.path
-                //
-                // li.addEventListener('click', selectTorrent)
-                magnets.appendChild(li)
-              })
-            }
-          } else {
-            magnets.innerHTML = 'no torrents'
+              // li.innerText = item.name + '/' + item.infoHash + '/' + item.path
+              //
+              // li.addEventListener('click', selectTorrent)
+              queue.appendChild(li)
+            })
           }
+        } else {
+          queue.innerHTML = 'no torrents'
         }
         listFiles()
-      }
-    }
-    xhr.send()
+      })
   }, 1000)
 }
 

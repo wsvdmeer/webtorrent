@@ -1,4 +1,4 @@
-const TorrentSearchApi = require('torrent-search-api')
+// const TorrentSearchApi = require('torrent-search-api')
 const WebTorrent = require('webtorrent')
 const fs = require('fs')
 const os = require('os')
@@ -6,27 +6,27 @@ const client = new WebTorrent()
 
 const directory = `${os.tmpdir()}/webtorrent/`
 const fileTypes = ['mp4', '.m4v', '.m4a']
+const getVideos = (files) => {
+  console.log(files)
+  const videos = []
+  if (files && files.length > 0) {
+    files.forEach((file) => {
+      console.log(file)
+      fileTypes.forEach((item) => {
+        if (file.name.endsWith(item)) {
+          videos.push(file)
+        }
+      })
+    })
+    console.log('autoplay : ' + videos)
+  }
+  return videos
+}
 class TorrentService {
   constructor (indexerService) {
     client.on('error', function (err) {
       console.error('ERROR: ' + err.message)
     })
-  }
-
-  getVideos (files) {
-    const videos = []
-    if (files && files.length > 0) {
-      files.forEach((file) => {
-        console.log(file)
-        fileTypes.forEach((item) => {
-          if (file.name.endsWith(item)) {
-            videos.push(file)
-          }
-        })
-      })
-      console.log('autoplay : ' + videos)
-    }
-    return videos
   }
 
   checkDirectoryForTorrents () {
@@ -66,7 +66,6 @@ class TorrentService {
   }
 
   getTorrents () {
-    this.checkDirectoryForTorrents()
     const torrent = client.torrents.reduce(function (array, data) {
       array.push({
         infoHash: data.infoHash,
@@ -89,56 +88,55 @@ class TorrentService {
     return torrent
   }
 
-  async removeTorrent (json) {
-    console.log(`public remove : ${json}`)
-    const data = JSON.parse(json)
-    const url = data.url
-    let magnet = url
-    if (url) {
-      if (url.match(/magnet:\?xt=urn:[a-z0-9]+:[a-z0-9]{32}/i) === null) {
-        magnet = TorrentSearchApi.getMagnet(url)// await indexerService.getMagnet(url)
-        console.log(`converted from link : ${magnet}`)
-      }
-      console.log('client remove : ' + magnet)
-      const torrent = client.get(magnet)
-      const path = torrent.path
-      client.remove(magnet, function (error) {
-        if (!error) {
-          try {
-            fs.rmdirSync(path, { recursive: true })
-            console.log(`${path} is deleted!`)
-            return true
-          } catch (err) {
-            console.error(`Error while deleting ${path}.`)
-            return false
-          }
-        } else {
+  async removeTorrent (magnet) {
+    console.log('client remove : ' + magnet)
+    const torrent = client.get(magnet)
+    console.log(torrent)
+    const path = torrent.path
+    client.remove(magnet, function (error) {
+      if (!error) {
+        try {
+          fs.rmdirSync(path, { recursive: true })
+          console.log(`${path} is deleted!`)
+          return true
+        } catch (err) {
+          console.error(`Error while deleting ${path}.`)
           return false
         }
-      })
-    }
+      } else {
+        return false
+      }
+    })
+    // }
   }
 
-  async addTorrent (json, callback) {
-    const data = JSON.parse(json)
-    const url = data.url
+  async addTorrent (magnet, callback) {
+    console.log('add torrent', magnet)
     const result = {
       status: 200,
       videos: []
     }
-    let magnet = url
-    if (url) {
-      if (url.match(/magnet:\?xt=urn:[a-z0-9]+:[a-z0-9]{32}/i) === null) {
-        // no a magnet link
-        magnet = await indexerService.getMagnet(url)
-        console.log(`converted from link : ${magnet}`)
+    // check if exsists
+    const files = []
+    const torrent = client.get(magnet)
+    if (torrent) {
+      console.log(`Get : ${magnet}`)
+      torrent.files.forEach(function (file) {
+        files.push({
+          hash: torrent.infoHash,
+          name: file.name,
+          length: file.length
+        })
+      })
+      if (files) {
+        const videos = getVideos(files)
+        result.status = 200
+        result.videos = videos
+        callback(result)
+        return true
       }
-
-      // check if exsists
-      const files = []
-      const torrent = client.get(magnet)
-      if (torrent) {
-        console.log(`Get : ${magnet}`)
+    } else {
+      client.add(magnet, async function (torrent) {
         torrent.files.forEach(function (file) {
           files.push({
             hash: torrent.infoHash,
@@ -147,38 +145,20 @@ class TorrentService {
           })
         })
         if (files) {
-          const videos = this.getVideos(files)
-          result.status = 200
-          result.videos = videos
+          const videos = getVideos(files)
+          if (videos.length > 0) {
+            result.status = 200
+            result.videos = videos
+          } else {
+            console.log('no videos autoremove', torrent.infoHash)
+            result.status = 200
+            result.videos = []
+          }
           callback(result)
           return true
         }
-      } else {
-        console.log(`Add ${json}`)
-        client.add(magnet, async function (torrent) {
-          torrent.files.forEach(function (file) {
-            files.push({
-              hash: torrent.infoHash,
-              name: file.name,
-              length: file.length
-            })
-          })
-          if (files) {
-            const videos = this.getVideos(files)
-            if (videos.length > 0) {
-              result.status = 200
-              result.json = videos
-              callback(result)
-            } else {
-              const remove = await this.removeTorrent(torrent.infoHash)
-              console.log('auto remove : ' + remove)
-            }
-            return true
-          }
-        })
-      }
+      })
     }
-    return false
   }
 }
 module.exports = TorrentService

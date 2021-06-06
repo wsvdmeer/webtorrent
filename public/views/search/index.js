@@ -17,10 +17,11 @@ const init = () => {
   })
 
   getInfo()
-  input.value = 'Mortal Kombat'
-  search(input.value, type.value)
+  // input.value = 'Mortal Kombat'
+  // search(input.value, type.value)
 }
 
+// TODO create utils
 const getTitle = (item) => {
   if (item.name) {
     return item.name
@@ -38,7 +39,7 @@ const getImage = (item) => {
 const search = async (value, type) => {
   if (value) {
     results.innerHTML = ''
-    await fetch('/search/' + JSON.stringify({
+    await fetch('/api/search/' + JSON.stringify({
       type: type,
       query: value,
       page: 1
@@ -52,7 +53,7 @@ const search = async (value, type) => {
             const li = document.createElement('li')
             const link = document.createElement('a')
             // todo got to /detail
-            link.setAttribute('href', `/searchtorrent/?type=${item.media_type}&query=${name}`)
+            link.setAttribute('href', `/detail?type=${item.media_type}&id=${item.id}&query=${name}`)
             link.setAttribute('target', '_self')
             li.appendChild(link)
 
@@ -70,9 +71,10 @@ const search = async (value, type) => {
   }
 }
 
+// todo make into component
 const getInfo = () => {
   setTimeout(async () => {
-    await fetch('/info/')
+    await fetch('/api/info/')
       .then((response) => response.json())
       .then((result) => {
         if (result) {

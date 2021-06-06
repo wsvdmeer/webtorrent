@@ -166,6 +166,23 @@ app.get('/api/gettorrentinfo/:torrent', async function (req, res) {
   res.json(result)
 })
 
+app.post('/api/add', async function (req, res) {
+  console.log(req.body)
+  const magnet = await indexerService.getMagnet(req.body)
+  await torrentService.addTorrent(magnet, (data) => {
+    console.log('data', data)
+    res.status(data.status)
+    res.json(data.videos)
+  })
+})
+app.post('/api/remove', async function (req, res) {
+  const magnet = req.body.magnet
+  console.log('remove', magnet)
+  const result = await torrentService.removeTorrent(magnet)
+  res.status(200)
+  res.json({ removed: result })
+})
+
 // TORRENTCLIENT
 // Info
 app.get('/api/info', async function (req, res, next) {
@@ -179,6 +196,7 @@ app.get('/api/info', async function (req, res, next) {
 })
 
 // Add torrent
+/*
 app.get('/api/add/:torrent', async function (req, res) {
   await torrentService.addTorrent(req.params.torrent, (result) => {
     res.status(result.status)
@@ -192,9 +210,15 @@ app.get('/api/remove/:torrent', async function (req, res) {
   const result = await torrentService.removeTorrent(req.params.torrent)
   res.status(200)
   res.json(result)
-})
+}) */
 
 // List torrents
+app.get('/api/scan', function (req, res, next) {
+  torrentService.checkDirectoryForTorrents()
+  res.status(200)
+  res.json(torrents)
+})
+
 app.get('/api/list', function (req, res, next) {
   const torrents = torrentService.getTorrents()
   res.status(200)

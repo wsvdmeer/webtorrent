@@ -1,9 +1,10 @@
 const results = document.getElementById('results')
+const loader = document.getElementById('loader')
+const error = document.getElementById('error')
+error.style.display = 'none'
 const init = () => {
   const queryString = window.location.search
-  console.log(queryString)
   const urlParams = new URLSearchParams(queryString)
-  console.log(urlParams)
   let type = urlParams.get('type')
   const query = urlParams.get('query')
   if (type === 'movie') {
@@ -12,25 +13,41 @@ const init = () => {
   searchIndexers(type, query)
 }
 
+const getMagnet = async (torrent) => {
+  await fetch('/api/add/', {
+    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(torrent)// body data type must match "Content-Type" header
+  }).then((response) => response.json())
+    .then((data) => {
+      console.log(data)
+      window.location.href = '/torrents'
+    })
+}
+
 const searchIndexers = async (type, query) => {
-  await fetch('/searchindexers/' + JSON.stringify({
+  loader.style.display = 'block'
+  await fetch('/api/searchindexers/' + JSON.stringify({
     type: type,
     query: query,
     page: 1
   }))
     .then((response) => response.json())
     .then((data) => {
+      loader.style.display = 'none'
       if (data.length > 0) {
-        data.forEach((item) => {
-          console.log(item)
+        error.style.display = 'none'
+        data.forEach((torrent) => {
           const li = document.createElement('li')
-          li.innerText = item.title
+          li.innerText = torrent.title
           results.appendChild(li)
+          li.addEventListener('click', () => { getMagnet(torrent) })
         })
       } else {
-        const li = document.createElement('li')
-        li.innerText = 'no results'
-        results.appendChild(li)
+        error.style.display = 'block'
+        error.innerText = 'error loading data'
       }
     })
 }

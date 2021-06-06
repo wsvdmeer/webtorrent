@@ -3,7 +3,7 @@ const fetch = require('node-fetch')
 const tmdbApiKey = process.env.TMDB_API_KEY
 const baseUrl = 'https://api.themoviedb.org/3'
 class TMDBService {
-  async getSeasons (id, season) {
+  async getSeason (id, season) {
     const result = await fetch(`${baseUrl}/tv/${id}/season/${season}?api_key=${tmdbApiKey}`).then(response => response.json())
     return result
   }
@@ -15,6 +15,11 @@ class TMDBService {
 
   async getTopRated (type) {
     const result = await fetch(`${baseUrl}/top_rated/${type}?api_key=${tmdbApiKey}`).then(response => response.json())
+    return result
+  }
+
+  async getDetail (type, id) {
+    const result = await fetch(`${baseUrl}/${type}/${id}?api_key=${tmdbApiKey}`).then(response => response.json())
     return result
   }
 
