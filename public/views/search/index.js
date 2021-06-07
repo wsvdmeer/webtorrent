@@ -53,7 +53,7 @@ const search = async (value, type) => {
             const li = document.createElement('li')
             const link = document.createElement('a')
             // todo got to /detail
-            link.setAttribute('href', `/detail?type=${item.media_type}&id=${item.id}&query=${name}`)
+            link.setAttribute('href', `/detail?type=${type}&id=${item.id}&query=${name}`)
             link.setAttribute('target', '_self')
             li.appendChild(link)
 
