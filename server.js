@@ -16,7 +16,7 @@ const port = process.env.PORT // || 4000
 
 const tmdbService = new TMDBService()
 const indexerService = new IndexerService()
-const torrentService = new TorrentService(indexerService)
+const torrentService = new TorrentService()
 const networkService = new NetworkService()
 
 // variables
@@ -213,13 +213,13 @@ app.get('/api/remove/:torrent', async function (req, res) {
 }) */
 
 // List torrents
-app.get('/api/scan', function (req, res, next) {
+app.get('/api/scan', function (_req, res, next) {
   torrentService.checkDirectoryForTorrents()
   res.status(200)
   res.json(torrents)
 })
 
-app.get('/api/list', function (req, res, next) {
+app.get('/api/list', function (_req, res, next) {
   const torrents = torrentService.getTorrents()
   res.status(200)
   res.json(torrents)
@@ -229,4 +229,5 @@ app.get('/api/list', function (req, res, next) {
 app.use('/', router)
 app.listen(port, () => {
   console.log(`Server running on port : ${port}`)
+  torrentService.checkDirectoryForTorrents()
 })

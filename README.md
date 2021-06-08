@@ -72,4 +72,12 @@ node server
 npm install --save-dev nodemon
 nodemon server
 
+## Autostart
+sudo npm install -g pm2 
+pm2 status
+pm2 start server.js
+pm2 save
+copy paste startup line
+sudo reboot
+
 

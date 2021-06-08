@@ -3,6 +3,9 @@ const WebTorrent = require('webtorrent')
 const fs = require('fs')
 const os = require('os')
 const client = new WebTorrent()
+client.on('error', function (err) {
+  console.error('ERROR: ' + err.message)
+})
 
 const directory = `${os.tmpdir()}/webtorrent/`
 const fileTypes = ['mp4', '.m4v', '.m4a']
@@ -23,13 +26,8 @@ const getVideos = (files) => {
   return videos
 }
 class TorrentService {
-  constructor (indexerService) {
-    client.on('error', function (err) {
-      console.error('ERROR: ' + err.message)
-    })
-  }
-
   checkDirectoryForTorrents () {
+    console.log('check directory')
     if (fs.existsSync(directory)) {
       fs.readdir(directory, (err, files) => {
         if (!err) {

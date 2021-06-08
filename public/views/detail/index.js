@@ -19,12 +19,11 @@ const getTitle = (item) => {
   return item.title
 }
 
-/*
 const getImage = (item) => {
-  if (item.poster_path) {
-    return `https://image.tmdb.org/t/p/w500${item.poster_path}`
+  if (item.backdrop_path) {
+    return `https://image.tmdb.org/t/p/original${item.backdrop_path}`
   }
-  retur */
+}
 
 const getDetails = async (type, id, query) => {
   await fetch('/api/detail/' + JSON.stringify({
@@ -45,7 +44,7 @@ const getDetails = async (type, id, query) => {
       button.innerText = 'Download'
       detailInfo.appendChild(button)
 
-      backdrop.setAttribute('src', `https://image.tmdb.org/t/p/original${data.backdrop_path}`)
+      backdrop.setAttribute('src', getImage(data))
     })
 }
 
