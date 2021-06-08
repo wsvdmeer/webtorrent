@@ -6,6 +6,10 @@
   font-weight: normal;
 }
 
+img{
+  transform: translateZ(0);
+}
+
 html,
 body {
   font-family: "Arial";

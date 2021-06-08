@@ -6,10 +6,14 @@ const info = document.getElementById('info')
 
 const init = () => {
   // events
-  input.addEventListener('keypress', function (e) {
+  input.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
       search(input.value, type.value)
     }
+  })
+
+  input.addEventListener('input', () => {
+    console.log(input.value)
   })
 
   button.addEventListener('click', () => {
@@ -53,7 +57,7 @@ const search = async (value, type) => {
             const li = document.createElement('li')
             const link = document.createElement('a')
             // todo got to /detail
-            link.setAttribute('href', `/detail?type=${type}&id=${item.id}&query=${name}`)
+            link.setAttribute('href', `/detail?type=${item.media_type ?? type}&id=${item.id}&query=${name}`)
             link.setAttribute('target', '_self')
             li.appendChild(link)
 
