@@ -63,22 +63,21 @@ const selectTorrent = (event) => {
     }
   }
   xhr.send()
-}
-
-const streamTorrent = (hash, file) => {
-  // send current file to other clients
-  const xhr = new XMLHttpRequest()
-  xhr.open('GET', '/setstream/' + hash + '/' + file, true)
-  xhr.setRequestHeader('Content-Type', 'application/json')
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4) {
-      if (xhr.responseText) {
-        console.log(`set : ${this.responseText}`)
-      }
-    }
-  }
-  xhr.send()
 } */
+
+const streamTorrent = async (magnet) => {
+  await fetch('/api/play/', {
+    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ magnet: magnet })
+  }).then((response) => response.json())
+    .then((data) => {
+      console.log(data)
+      window.location.href = '/player'
+    })
+}
 
 const scanDirectory = async () => {
   await fetch('/api/scan/')
@@ -143,12 +142,11 @@ const listFiles = () => {
             // remove.setAttribute('path', item.path)
             remove.addEventListener('click', () => { removeTorrent(item.magnetUri) })
 
-            /*
-              const play = document.createElement('button')
-              play.innerText = 'Play'
-              li.appendChild(play)
-              play.setAttribute('url', item.magnetUri)
-              play.addEventListener('click', selectTorrent) */
+            const play = document.createElement('button')
+            play.innerText = 'Play'
+            li.appendChild(play)
+            play.setAttribute('url', item.magnetUri)
+            play.addEventListener('click', () => { streamTorrent(item.infoHash, item.path) })
 
             /* let infoText = ''
 

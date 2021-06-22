@@ -108,6 +108,32 @@ class TorrentService {
     // }
   }
 
+  async getTorrentFiles (magnet, callback) {
+    const files = []
+    const torrent = client.get(magnet)
+    const result = {
+      status: 200,
+      videos: []
+    }
+    if (torrent) {
+      console.log(`Get : ${magnet}`)
+      torrent.files.forEach(function (file) {
+        files.push({
+          hash: torrent.infoHash,
+          name: file.name,
+          length: file.length
+        })
+      })
+      if (files) {
+        const videos = getVideos(files)
+        result.status = 200
+        result.videos = videos
+        callback(result)
+        return true
+      }
+    }
+  }
+
   async addTorrent (magnet, callback) {
     console.log('add torrent', magnet)
     const result = {

@@ -12,3 +12,16 @@
     height:100%;
     color:white;
 }
+
+.episodes{
+    background-color:#222;
+}
+
+
+
+.episode img{
+    width:100px;
+    height:auto;
+    display: inline-block;
+}
+
