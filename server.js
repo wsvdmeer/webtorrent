@@ -24,10 +24,6 @@ let networkInfo
 networkService.getNetworkInfo((result) => {
   networkInfo = result
 })
-let currentStream = {
-  hash: '',
-  filename: ''
-}
 
 const torrents = []
 
@@ -82,72 +78,46 @@ app.get('/api/season/:query', async function async (req, res, next) {
   res.send(JSON.stringify(result))
 })
 
-// STREAM
-// Set current stream
-app.get('/api/setstream/:magnet/:filename', async function (req, res, next) {
-  const magnet = req.params.magnet // data.hash
-  const filename = req.params.filename // data.file
-  currentStream = {
-    hash: magnet,
-    filename: filename
-  }
-  console.log(`stream : ${currentStream.hash} ${currentStream.filename}`)
-})
-
 // Start stream
-app.get('/api/stream/:magnet/:filename', async function (req, res, next) {
+app.get('/api/stream/:magnet', async function (req, res, next) {
   const magnet = req.params.magnet // data.hash
-  const filename = req.params.filename // data.file
-  const torrent = torrentService.getTorrent(magnet)// client.get(magnet)
-  let file = {}
-  if (!torrent) {
-    const err = new Error('Torrent null')
-    err.status = 405
-    next(err)
-  }
-  torrent.files.forEach((torrent) => {
-    if (torrent.name === filename) {
-      file = torrent
+  console.log('stream magnet : ', magnet)
+  await torrentService.getTorrentFiles(magnet, (data) => {
+    if (data.videos.length > 0) {
+      console.log('magnet', magnet)
+      console.log('videos', data.videos)
+      const file = data.videos[0].file
+      const range = req.headers.range
+      if (!range) {
+        const err = new Error('Wrong range')
+        err.status = 416
+        next(err)
+      }
+      const positions = range.replace(/bytes=/, '').split('-')
+      const start = parseInt(positions[0], 10)
+      const fileSize = file.length
+      const end = positions[1] ? parseInt(positions[1], 10) : fileSize - 1
+      const chunksize = end - start + 1
+      const head = {
+        'Content-Range': 'bytes ' + start + '-' + end + '/' + fileSize,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': chunksize,
+        'Content-Type': 'video/mp4'
+      }
+      res.writeHead(206, head)
+      const streamPosition = {
+        start: start,
+        end: end
+      }
+      const stream = file.createReadStream(streamPosition)// file.createReadStream(streamPosition)
+      stream.pipe(res)
+      stream.on('error', function (err) {
+        next(err)
+      })
     }
+    res.status(data.status)
+    // res.json(data.videos)
   })
-
-  const range = req.headers.range
-  if (!range) {
-    const err = new Error('Wrong range')
-    err.status = 416
-    next(err)
-  }
-  const positions = range.replace(/bytes=/, '').split('-')
-  const start = parseInt(positions[0], 10)
-  const fileSize = file.length
-  const end = positions[1] ? parseInt(positions[1], 10) : fileSize - 1
-  const chunksize = end - start + 1
-  const head = {
-    'Content-Range': 'bytes ' + start + '-' + end + '/' + fileSize,
-    'Accept-Ranges': 'bytes',
-    'Content-Length': chunksize,
-    'Content-Type': 'video/mp4'
-  }
-  res.writeHead(206, head)
-  const streamPosition = {
-    start: start,
-    end: end
-  }
-  const stream = file.createReadStream(streamPosition)
-  stream.pipe(res)
-  stream.on('error', function (err) {
-    next(err)
-  })
-})
-
-// Get current stream
-app.get('/api/currentstream', function (req, res, next) {
-  if (currentStream) {
-    if (currentStream.hash && currentStream.filename) {
-      res.status(200)
-      res.json(currentStream)
-    }
-  }
 })
 
 // TORRENT INDEXER
@@ -176,11 +146,12 @@ app.get('/api/gettorrentinfo/:torrent', async function (req, res) {
 app.post('/api/add', async function (req, res) {
   console.log(req.body)
   const magnet = await indexerService.getMagnet(req.body)
-  await torrentService.addTorrent(magnet, (data) => {
+  const result = await torrentService.addTorrent(magnet, (data) => {
     console.log('data', data)
     res.status(data.status)
-    res.json(data.videos)
+    // res.json(data.videos)
   })
+  console.log(result)
 })
 app.post('/api/remove', async function (req, res) {
   const magnet = req.body.magnet
@@ -188,62 +159,6 @@ app.post('/api/remove', async function (req, res) {
   const result = await torrentService.removeTorrent(magnet)
   res.status(200)
   res.json({ removed: result })
-})
-
-app.post('/api/play', async function (req, res, next) {
-  const magnet = req.body.magnet
-  await torrentService.getTorrentFiles(magnet, (data) => {
-    console.log('data', data)
-
-    /* if (data.videos.length > 0) {
-      console.log(magnet)
-      console.log(data.videos)
-      // const hash = data.videos[0].hash // data.hash
-      const filename = data.videos[0].filename // data.file
-      const torrent = torrentService.getTorrent(magnet)// client.get(magnet)
-      let file = {}
-      if (!torrent) {
-        const err = new Error('Torrent null')
-        err.status = 405
-        next(err)
-      }
-      torrent.files.forEach((torrent) => {
-        if (torrent.name === filename) {
-          file = torrent
-        }
-      })
-
-      const range = req.headers.range
-      if (!range) {
-        const err = new Error('Wrong range')
-        err.status = 416
-        next(err)
-      }
-      const positions = range.replace(/bytes=/, '').split('-')
-      const start = parseInt(positions[0], 10)
-      const fileSize = file.length
-      const end = positions[1] ? parseInt(positions[1], 10) : fileSize - 1
-      const chunksize = end - start + 1
-      const head = {
-        'Content-Range': 'bytes ' + start + '-' + end + '/' + fileSize,
-        'Accept-Ranges': 'bytes',
-        'Content-Length': chunksize,
-        'Content-Type': 'video/mp4'
-      }
-      res.writeHead(206, head)
-      const streamPosition = {
-        start: start,
-        end: end
-      }
-      const stream = file.createReadStream(streamPosition)
-      stream.pipe(res)
-      stream.on('error', function (err) {
-        next(err)
-      })
-    } */
-    // res.status(data.status)
-    // res.json(data.videos)
-  })
 })
 
 // TORRENTCLIENT
@@ -257,23 +172,6 @@ app.get('/api/info', async function (req, res, next) {
   res.status(200)
   res.json(data)
 })
-
-// Add torrent
-/*
-app.get('/api/add/:torrent', async function (req, res) {
-  await torrentService.addTorrent(req.params.torrent, (result) => {
-    res.status(result.status)
-    res.json(result.json)
-  })
-})
-
-// Remove torrent
-app.get('/api/remove/:torrent', async function (req, res) {
-  console.log(`remove : ${req.params.torrents}`)
-  const result = await torrentService.removeTorrent(req.params.torrent)
-  res.status(200)
-  res.json(result)
-}) */
 
 // List torrents
 app.get('/api/scan', function (_req, res, next) {

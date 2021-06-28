@@ -1,10 +1,13 @@
 let player
 // let videoControls
 // let playButton
-let info
-let tempVideo
+let magnet
 const init = () => {
-  info = document.getElementById('info')
+  const queryString = window.location.search
+  const urlParams = new URLSearchParams(queryString)
+  magnet = urlParams.get('magnet')
+
+  console.log('magnet', magnet)
   player = document.getElementById('video')
   // videoControls = document.getElementById('video-controls')
 
@@ -15,7 +18,10 @@ const init = () => {
   // playButton = document.getElementById('play')
   // playButton.addEventListener('click', togglePlay);
 
-  checkStream()
+  // checkStream()
+
+  // const currentVideo = '/stream/' + magnet
+  player.setAttribute('src', 'api/stream/' + magnet)
 }
 
 /*
@@ -34,11 +40,23 @@ const togglePlay = () => {
     player.pause()
   }
 } */
+/*
+const checkStream = async () => {
+  await fetch(`/api/stream/${magnet}`, {
+    method: 'GET' // *GET, POST, PUT, DELETE, etc.
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ magnet: magnet })
+  }).then((response) => response.json())
+    .then((data) => {
+      console.log(data)
+      // this.window.location = '/torrents'
+    })
 
-const checkStream = () => {
-  setTimeout(function () {
+  /* setTimeout(function () {
     const xhr = new XMLHttpRequest()
-    xhr.open('GET', '/currentstream/', true)
+    xhr.open('GET', '/play/', true)
     xhr.setRequestHeader('Content-Type', 'application/json')
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4) {
@@ -60,6 +78,6 @@ const checkStream = () => {
     }
     xhr.send()
   }, 1000)
-}
+} */
 
 document.addEventListener('DOMContentLoaded', init)

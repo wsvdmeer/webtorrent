@@ -41,6 +41,7 @@ const searchIndexers = async (type, query) => {
         error.style.display = 'none'
         data.forEach((torrent) => {
           const li = document.createElement('li')
+          console.log(torrent)
           li.innerText = torrent.title
           results.appendChild(li)
           li.addEventListener('click', () => { getMagnet(torrent) })

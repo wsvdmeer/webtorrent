@@ -13,15 +13,16 @@ const getVideos = (files) => {
   console.log(files)
   const videos = []
   if (files && files.length > 0) {
-    files.forEach((file) => {
-      console.log(file)
-      fileTypes.forEach((item) => {
-        if (file.name.endsWith(item)) {
-          videos.push(file)
+    files.forEach((item) => {
+      console.log('file', item.file.name)
+      fileTypes.forEach((type) => {
+        if (item.file?.name?.endsWith(type)) {
+          if (!videos.includes(item)) {
+            videos.push(item)
+          }
         }
       })
     })
-    console.log('autoplay : ' + videos)
   }
   return videos
 }
@@ -116,40 +117,12 @@ class TorrentService {
       videos: []
     }
     if (torrent) {
-      console.log(`Get : ${magnet}`)
+      console.log(`Torrent found : ${magnet}`)
       torrent.files.forEach(function (file) {
+        console.log('file', file)
         files.push({
-          hash: torrent.infoHash,
-          name: file.name,
-          length: file.length
-        })
-      })
-      if (files) {
-        const videos = getVideos(files)
-        result.status = 200
-        result.videos = videos
-        callback(result)
-        return true
-      }
-    }
-  }
-
-  async addTorrent (magnet, callback) {
-    console.log('add torrent', magnet)
-    const result = {
-      status: 200,
-      videos: []
-    }
-    // check if exsists
-    const files = []
-    const torrent = client.get(magnet)
-    if (torrent) {
-      console.log(`Get : ${magnet}`)
-      torrent.files.forEach(function (file) {
-        files.push({
-          hash: torrent.infoHash,
-          name: file.name,
-          length: file.length
+          file: file,
+          hash: torrent.infoHash
         })
       })
       if (files) {
@@ -160,14 +133,43 @@ class TorrentService {
         return true
       }
     } else {
+      console.log('torrent not found')
+    }
+  }
+
+  async addTorrent (magnet, callback) {
+    const result = {
+      status: 200,
+      videos: []
+    }
+    // check if exsists
+    const files = []
+    const torrent = client.get(magnet)
+    if (torrent) {
+      console.log(`GET : ${magnet}`)
+      torrent.files.forEach(function (file) {
+        files.push({
+          hash: torrent.infoHash,
+          name: file.name,
+          length: file.length
+        })
+      })
+      if (files) {
+        const videos = getVideos(files)
+        result.status = 200
+        result.videos = videos
+      }
+      callback(result)
+    } else {
+      console.log(`ADD : ${magnet}`)
       client.add(magnet, async function (torrent) {
         torrent.files.forEach(function (file) {
           files.push({
             hash: torrent.infoHash,
-            name: file.name,
-            length: file.length
+            file: file
           })
         })
+
         if (files) {
           const videos = getVideos(files)
           if (videos.length > 0) {
@@ -175,11 +177,13 @@ class TorrentService {
             result.videos = videos
           } else {
             console.log('no videos autoremove', torrent.infoHash)
+            await this.removeTorrent(magnet)
             result.status = 200
             result.videos = []
           }
           callback(result)
-          return true
+        } else {
+          callback(result)
         }
       })
     }
