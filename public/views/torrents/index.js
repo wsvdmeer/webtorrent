@@ -1,6 +1,7 @@
 
 let magnetResults
-const queue = document.getElementById('queue')
+const results = document.getElementById('results')
+const loader = document.getElementById('loader')
 const removeTorrent = async (magnet) => {
   await fetch('/api/remove/', {
     method: 'POST', // *GET, POST, PUT, DELETE, etc.
@@ -13,73 +14,21 @@ const removeTorrent = async (magnet) => {
       console.log(data)
       // this.window.location = '/torrents'
     })
-
-  /* const url = event.target.getAttribute('url')
-  const encodedUri = encodeURIComponent(url)
-  const query = {
-    url: encodedUri
-  }
-  const xhr = new XMLHttpRequest()
-  xhr.open('GET', '/remove/' + JSON.stringify(query), true)
-  xhr.setRequestHeader('Content-Type', 'application/json')
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4) {
-      if (xhr.responseText) {
-        console.log(xhr.responseText)
-      }
-    }
-  }
-  xhr.send() */
 }
 
 const init = () => {
+  loader.style.display = 'block'
+  loader.innerText = 'loading...'
   scanDirectory()
-  listFiles()
+  fetchData()
 }
 
-/*
-const selectTorrent = (event) => {
-  const url = event.target.getAttribute('url')
-  console.log(url)
-  const encodedUri = encodeURIComponent(url)
-  console.log(encodedUri)
-  const query = {
-    url: encodedUri
-  }
-  const xhr = new XMLHttpRequest()
-  xhr.open('GET', '/add/' + JSON.stringify(query), true)
-  xhr.setRequestHeader('Content-Type', 'application/json')
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4) {
-      if (xhr.responseText) {
-        console.log(xhr.responseText)
-        const results = JSON.parse(xhr.responseText)
-        console.log(results)
-        // autoplay first item
-        streamTorrent(results[0].hash, results[0].name)
-
-        // window.location.href = '/player'
-      }
-    }
-  }
-  xhr.send()
-} */
-
-const streamTorrent = async (magnet) => {
-  await fetch('/api/play/', {
-    method: 'POST', // *GET, POST, PUT, DELETE, etc.
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ magnet: magnet })
-  }).then((response) => response.json())
-    .then((data) => {
-      console.log(data)
-      window.location.href = '/player'
-    })
+const streamTorrent = async (magnet, filename) => {
+  window.location.href = '/player?magnet=' + magnet
 }
 
 const scanDirectory = async () => {
+  loader.innerText = 'scanning directory...'
   await fetch('/api/scan/')
 }
 
@@ -94,80 +43,76 @@ const formatBytes = (bytes, decimals) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
-const listFiles = () => {
-  setTimeout(async () => {
-    await fetch('/api/list/')
-      .then((response) => response.json())
-      .then((results) => {
-        console.log(results)
-        const filter = results.filter((x) => x.ready === true)
-        queue.innerHTML = ''
-        if (filter.length > 0) {
-          // if (JSON.stringify(results) !== JSON.stringify(magnetResults)) {
-          magnetResults = filter
+const fetchData = async () => {
+  loader.innerText = 'fetching data...'
+  await fetch('/api/list/')
+    .then((response) => response.json())
+    .then((result) => {
+      console.log(result)
+      const filter = result.filter((x) => x.ready === true)
+      results.innerHTML = ''
+      if (filter.length > 0) {
+      // if (JSON.stringify(results) !== JSON.stringify(magnetResults)) {
+        magnetResults = filter
 
-          magnetResults.forEach(item => {
-            const li = document.createElement('li')
-            const title = document.createElement('h2')
-            title.innerText = item.name
-            li.appendChild(title)
+        magnetResults.forEach(item => {
+          const li = document.createElement('li')
+          const title = document.createElement('h2')
+          title.innerText = item.name
+          li.appendChild(title)
 
-            const downloaded = document.createElement('div')
-            downloaded.innerText = `downloaded ${formatBytes(item.downloaded, 2)}`
-            li.appendChild(downloaded)
+          const downloaded = document.createElement('div')
+          downloaded.innerText = `downloaded ${formatBytes(item.downloaded, 2)}`
+          li.appendChild(downloaded)
 
-            const uploaded = document.createElement('div')
-            uploaded.innerText = `uploaded ${formatBytes(item.uploaded, 2)}`
-            li.appendChild(uploaded)
+          const uploaded = document.createElement('div')
+          uploaded.innerText = `uploaded ${formatBytes(item.uploaded, 2)}`
+          li.appendChild(uploaded)
 
-            const downloadSpeed = document.createElement('div')
-            downloadSpeed.innerText = `download speed ${formatBytes(item.downloadSpeed, 2)}`
-            li.appendChild(downloadSpeed)
+          const downloadSpeed = document.createElement('div')
+          downloadSpeed.innerText = `download speed ${formatBytes(item.downloadSpeed, 2)}`
+          li.appendChild(downloadSpeed)
 
-            const progressBar = document.createElement('div')
-            progressBar.classList.add('progressbar')
-            li.appendChild(progressBar)
+          const progressBar = document.createElement('div')
+          progressBar.classList.add('progressbar')
+          li.appendChild(progressBar)
 
-            const progress = document.createElement('div')
-            progressBar.appendChild(progress)
-            progress.style.width = `${item.progress * 100}%`
+          const progress = document.createElement('div')
+          progressBar.appendChild(progress)
+          progress.style.width = `${item.progress * 100}%`
 
-            /* const infoList = document.createElement('div')
-              li.appendChild(infoList) */
+          /* const infoList = document.createElement('div')
+          li.appendChild(infoList) */
 
-            const remove = document.createElement('button')
-            remove.innerText = 'Remove'
-            li.appendChild(remove)
-            // remove.setAttribute('magnet', item.magnetUri)
-            // remove.setAttribute('path', item.path)
-            remove.addEventListener('click', () => { removeTorrent(item.magnetUri) })
+          const remove = document.createElement('button')
+          remove.innerText = 'Remove'
+          li.appendChild(remove)
+          // remove.setAttribute('magnet', item.magnetUri)
+          // remove.setAttribute('path', item.path)
+          remove.addEventListener('click', () => { removeTorrent(item.magnetUri) })
 
-            const play = document.createElement('button')
-            play.innerText = 'Play'
-            li.appendChild(play)
-            play.setAttribute('url', item.magnetUri)
-            play.addEventListener('click', () => { streamTorrent(item.infoHash, item.path) })
+          const play = document.createElement('button')
+          play.innerText = 'Play'
+          li.appendChild(play)
+          play.setAttribute('url', item.magnetUri)
+          play.addEventListener('click', () => { streamTorrent(item.infoHash, item.path) })
 
-            /* let infoText = ''
+          /* let infoText = ''
 
-              for (const [key, value] of Object.entries(item)) {
-                infoText += `${key} : ${value}\n`
-              }
-              infoList.innerText = infoText */
+          for (const [key, value] of Object.entries(item)) {
+            infoText += `${key} : ${value}\n`
+          }
+          infoList.innerText = infoText */
 
-            // li.innerText = item.name + '/' + item.infoHash + '/' + item.path
-            //
-            // li.addEventListener('click', selectTorrent)
-            queue.appendChild(li)
-          })
-        }
-        // } else {
-        // queue.innerHTML = 'no torrents'
-        // }
-
-        listFiles()
-      })
-  }, 10000)
+          // li.innerText = item.name + '/' + item.infoHash + '/' + item.path
+          //
+          // li.addEventListener('click', selectTorrent)
+          results.appendChild(li)
+        })
+      }
+    })
+  loader.style.display = 'none'
+  setTimeout(fetchData, 10000)
 }
 
 document.addEventListener('DOMContentLoaded', init)
