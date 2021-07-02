@@ -2,6 +2,7 @@
 let magnetResults
 const results = document.getElementById('results')
 const loader = document.getElementById('loader')
+let timeout
 const removeTorrent = async (magnet) => {
   await fetch('/api/remove/', {
     method: 'POST', // *GET, POST, PUT, DELETE, etc.
@@ -12,7 +13,7 @@ const removeTorrent = async (magnet) => {
   }).then((response) => response.json())
     .then((data) => {
       console.log(data)
-      // this.window.location = '/torrents'
+      fetchData()
     })
 }
 
@@ -45,6 +46,7 @@ const formatBytes = (bytes, decimals) => {
 
 const fetchData = async () => {
   loader.innerText = 'fetching data...'
+  clearTimeout(timeout)
   await fetch('/api/list/')
     .then((response) => response.json())
     .then((result) => {
@@ -112,7 +114,8 @@ const fetchData = async () => {
       }
     })
   loader.style.display = 'none'
-  setTimeout(fetchData, 10000)
+
+  timeout = setTimeout(fetchData, 1000)
 }
 
 document.addEventListener('DOMContentLoaded', init)
