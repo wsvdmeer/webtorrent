@@ -14,9 +14,8 @@ const getVideos = (files) => {
   const videos = []
   if (files && files.length > 0) {
     files.forEach((item) => {
-      console.log('file', item.file.name)
       fileTypes.forEach((type) => {
-        if (item.file?.name?.endsWith(type)) {
+        if (item.file && item.file.name && item.file.name.endsWith(type)) {
           if (!videos.includes(item)) {
             videos.push(item)
           }
