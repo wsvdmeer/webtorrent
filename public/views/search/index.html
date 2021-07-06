@@ -8,6 +8,7 @@
 </head>
 
 <body>
+  
   <div id="nav">
     <input type="text" id="input" placeholder="search" />
     <select name="type" id="type">
@@ -15,9 +16,11 @@
       <option value="tv">TV</option>
       <option value="movie">Movies</option>
     </select>
-    <button id="button">Search</button>
   </div>
+
   <div id="main">
+    <div id="loader">Loading...</div>
+    <div id="error"></div>
     <ul id='results'>
     </ul>
   </div>

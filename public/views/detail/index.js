@@ -36,7 +36,7 @@ const getEpisodeQuery = (title, episode) => {
     e = `e0${episode.episode_number}`
   }
 
-  return `${title} ${s} ${e}`
+  return `${title} ${s}${e}`
 }
 
 const typeOptions = async (view, type, data) => {
@@ -79,15 +79,29 @@ const fetchSeason = async (view, data, type, id) => {
         link.setAttribute('target', '_self')
         item.appendChild(link)
 
+        const imageContainer = document.createElement('div')
+        imageContainer.classList.add('image-container')
+        link.appendChild(imageContainer)
+
         const img = document.createElement('img')
         img.setAttribute('src', `https://image.tmdb.org/t/p/w500${
           episode.still_path ? episode.still_path : data.poster_path
         }`)
-        link.appendChild(img)
+        imageContainer.appendChild(img)
+
+        const info = document.createElement('div')
+        info.classList.add('episode-info')
+        link.appendChild(info)
 
         const title = document.createElement('span')
         title.innerText = episode.name
-        link.appendChild(title)
+        title.classList.add('title')
+        info.appendChild(title)
+
+        const text = document.createElement('p')
+        text.innerText = episode.overview
+        text.classList.add('text')
+        info.appendChild(text)
 
         view.appendChild(item)
       })

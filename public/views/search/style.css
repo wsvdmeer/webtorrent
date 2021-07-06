@@ -6,7 +6,7 @@
     width: 100%;
     background-color: #fff;
     padding: 20px;
-    height: 100px;
+    height: 80px;
   }
 
   #main {
@@ -32,8 +32,7 @@
     color:white;
     display: grid;
     gap: 1rem;
-    grid-auto-columns: 12.5rem;
-    grid-auto-flow: column;
+    grid-template-columns: repeat( auto-fit, minmax(12.5rem, 1fr) );
     padding: 1rem;
   }
 
@@ -41,7 +40,7 @@
     position: relative;
     box-shadow: 0px 0px 1rem rgba(0, 0, 0, 0.8);
     cursor: pointer;
-    height: 18.75rem;
+    aspect-ratio: 3 / 4;
     overflow: hidden;
     border-radius: 0.3rem;
     background-color:black;

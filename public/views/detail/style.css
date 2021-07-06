@@ -5,23 +5,64 @@
 }
 
 #detail{
-    position: absolute;
-    top:0;
-    left:0;
     width:100%;
-    height:100%;
+
     color:white;
 }
 
 .episodes{
     background-color:#222;
+    margin-top:1rem;
 }
 
+.episodes .item{
+    width:100%;
+    margin-bottom:1rem;
+   
+}
+.episodes .item a{
+    display: grid;
+    grid-template-columns: auto 1fr;
+}
+
+.episodes .item:hover img {
+    transform: scale(1.2);
+  }
 
 
-.episode img{
-    width:100px;
-    height:auto;
+
+.episodes .item .image-container{
+    height:100px;
+    position: relative;
+    box-shadow: 0px 0px 1rem rgba(0, 0, 0, 0.8);
+    cursor: pointer;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 0.3rem;
+    background-color:black;
     display: inline-block;
 }
 
+.episode-info{
+    padding:1rem;
+    overflow: hidden;
+}
+
+.episode-info .title{
+    font-size:1.4rem;
+}
+
+.episode-info .text{
+    opacity: 0.7;
+}
+
+
+
+.episodes .item .image-container img{
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    display: block;
+    transition: all 0.5s;
+}
