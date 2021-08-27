@@ -78,11 +78,13 @@ app.get('/api/season/:query', async function async (req, res, next) {
   res.send(JSON.stringify(result))
 })
 
+// STREAM
 // Start stream
 app.get('/api/stream/:magnet', async function (req, res, next) {
   const magnet = req.params.magnet // data.hash
   console.log('stream magnet : ', magnet)
   await torrentService.getTorrentFiles(magnet, (data) => {
+    console.log(data)
     if (data.videos.length > 0) {
       console.log('magnet', magnet)
       console.log('videos', data.videos)
@@ -109,7 +111,7 @@ app.get('/api/stream/:magnet', async function (req, res, next) {
         start: start,
         end: end
       }
-      const stream = file.createReadStream(streamPosition)// file.createReadStream(streamPosition)
+      const stream = file.createReadStream(streamPosition)
       stream.pipe(res)
       stream.on('error', function (err) {
         next(err)

@@ -27,6 +27,7 @@ const init = () => {
   input.addEventListener('input', () => {
     console.log('input')
     if (tempSearch !== input.value) {
+      console.log(tempSearch, input.value)
       startSearch()
       tempSearch = input.value
     }
@@ -54,9 +55,13 @@ const updateQuery = () => {
   const searchParams = new URLSearchParams(window.location.search)
   if (type.value) {
     searchParams.set('type', type.value)
+  } else {
+    searchParams.delete('type')
   }
   if (input.value) {
     searchParams.set('query', input.value)
+  } else {
+    searchParams.delete('query')
   }
   const newRelativePathQuery =
     window.location.pathname + '?' + searchParams.toString()
@@ -132,6 +137,8 @@ const search = async (value, type) => {
           error.innerText = 'error loading data'
         }
       })
+  } else {
+    results.innerHTML = ''
   }
   loader.style.display = 'none'
 }
