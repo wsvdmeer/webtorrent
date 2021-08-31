@@ -39,11 +39,17 @@ input {
   padding: 10px;
 }
 
-button {
-  border: none;
-  background-color: #000;
+button,.button {
+  border: 1px solid white;
+  background-color: transparent;
   color: white;
-  padding: 10px;
-  border-radius: 5px;
+  padding: 1rem 2rem;
+  border-radius: 3px;
   cursor: pointer;
+  display: inline-block;
+}
+
+.info {
+  position: fixed;
+  bottom: 0;
 }

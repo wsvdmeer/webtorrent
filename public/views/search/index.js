@@ -4,8 +4,8 @@ const type = document.getElementById('type')
 // const button = document.getElementById('button')
 const input = document.getElementById('input')
 const results = document.getElementById('results')
-const info = document.getElementById('info')
-let infoTimer
+// const info = document.getElementById('info')
+// let infoTimer
 let searchTimeout
 let tempSearch
 let tempSelect
@@ -36,8 +36,6 @@ const init = () => {
   console.log(currentType, currentQuery)
 
   setInitialValues(currentType, currentQuery)
-
-  getInfo()
 }
 
 const setInitialValues = (currentType, currentQuery) => {
@@ -134,7 +132,7 @@ const search = async (value, type) => {
           })
         } else {
           error.style.display = 'block'
-          error.innerText = 'error loading data'
+          error.innerText = 'no results'
         }
       })
   } else {
@@ -144,6 +142,7 @@ const search = async (value, type) => {
 }
 
 // todo make into component
+/*
 const getInfo = async () => {
   clearTimeout(infoTimer)
   await fetch('/api/info/')
@@ -154,6 +153,6 @@ const getInfo = async () => {
       }
     })
   infoTimer = setTimeout(() => { getInfo() }, 1000)
-}
+} */
 
 document.addEventListener('DOMContentLoaded', init)

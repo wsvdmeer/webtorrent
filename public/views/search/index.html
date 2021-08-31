@@ -4,11 +4,13 @@
 <head>
   <link rel="stylesheet" href="/style/app.css">
   <link rel="stylesheet" href="/views/search/style.css">
+  <script type="module" src="components/networkinfo.js"></script>
   <script type="module" src='/views/search/index.js'></script>
+
 </head>
 
 <body>
-  
+ 
   <div id="nav">
     <input type="text" id="input" placeholder="search" />
     <select name="type" id="type">
@@ -19,12 +21,14 @@
   </div>
 
   <div id="main">
+    
     <div id="loader"></div>
     <div id="error"></div>
     <ul id='results'>
     </ul>
   </div>
-  <div id="info"></div>
+  <networkinfo-component class="info"></networkinfo-component>
+  
 </body>
 
 </html>

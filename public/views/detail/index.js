@@ -75,6 +75,7 @@ const fetchSeason = async (view, data, type, id) => {
         item.classList.add('item')
 
         const link = document.createElement('a')
+        link.classList.add('button')
         link.setAttribute('href', `/searchtorrent?type=${type}&query=${getEpisodeQuery(tvTitle, episode)}`)
         link.setAttribute('target', '_self')
         item.appendChild(link)
@@ -131,8 +132,9 @@ const getDetails = async (type, id, query) => {
         await typeOptions(infoContainer, type, data)
       } else {
         const button = document.createElement('a')
+        button.classList.add('button')
         button.setAttribute('href', `/searchtorrent?type=${type}&query=${query}`)
-        button.setAttribute('tartet', '_self')
+        button.setAttribute('target', '_self')
         button.innerText = 'Download'
         detailInfo.appendChild(button)
       }

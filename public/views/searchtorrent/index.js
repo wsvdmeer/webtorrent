@@ -42,13 +42,13 @@ const searchIndexers = async (type, query) => {
         data.forEach((torrent) => {
           const li = document.createElement('li')
           console.log(torrent)
-          li.innerText = torrent.title
+          li.innerText = `${torrent.provider} - ${torrent.title} | ${torrent.size}`
           results.appendChild(li)
           li.addEventListener('click', () => { getMagnet(torrent) })
         })
       } else {
         error.style.display = 'block'
-        error.innerText = 'error loading data'
+        error.innerText = 'no results'
       }
     })
 }
